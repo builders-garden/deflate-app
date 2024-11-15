@@ -1,11 +1,22 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
-import 'react-native-reanimated';
+import "../styles/globals.css";
+import {
+  DarkTheme,
+  DefaultTheme,
+  ThemeProvider,
+} from "@react-navigation/native";
+import { useFonts } from "expo-font";
+import { Stack } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+import { useEffect } from "react";
+import "react-native-reanimated";
+import { PrivyElements, PrivyProvider } from "@privy-io/expo";
+import {
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_600SemiBold,
+} from "@expo-google-fonts/inter";
 
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { useColorScheme } from "@/hooks/useColorScheme";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -13,25 +24,46 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    BG_Bold: require("../assets/fonts/BricolageGrotesque-Bold.ttf"),
+    BG_Regular: require("../assets/fonts/BricolageGrotesque-Regular.ttf"),
+    BG_Medium: require("../assets/fonts/BricolageGrotesque-Medium.ttf"),
+    BG_SemiBold: require("../assets/fonts/BricolageGrotesque-SemiBold.ttf"),
+    BG_ExtraBold: require("../assets/fonts/BricolageGrotesque-ExtraBold.ttf"),
+    BG_ExtraLight: require("../assets/fonts/BricolageGrotesque-ExtraLight.ttf"),
+    BG_Light: require("../assets/fonts/BricolageGrotesque-Light.ttf"),
+  });
+  const [interLoaded] = useFonts({
+    Inter_400Regular,
+    Inter_500Medium,
+    Inter_600SemiBold,
   });
 
   useEffect(() => {
-    if (loaded) {
+    if (loaded && interLoaded) {
       SplashScreen.hideAsync();
     }
-  }, [loaded]);
+  }, [loaded, interLoaded]);
 
-  if (!loaded) {
+  if (!loaded || !interLoaded) {
     return null;
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-    </ThemeProvider>
+    <>
+      <PrivyProvider
+        appId={process.env.EXPO_PUBLIC_PRIVY_APP_ID!}
+        clientId={process.env.EXPO_PUBLIC_PRIVY_CLIENT_ID!}
+      >
+        <ThemeProvider
+          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+        >
+          <Stack>
+            <Stack.Screen name="(app)" options={{ headerShown: false }} />
+            <Stack.Screen name="+not-found" />
+          </Stack>
+        </ThemeProvider>
+        <PrivyElements />
+      </PrivyProvider>
+    </>
   );
 }
