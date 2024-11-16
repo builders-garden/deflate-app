@@ -3,7 +3,7 @@ import { DeflateInput } from "@/components/deflate-input";
 import { DeflateText } from "@/components/deflate-text";
 import { usePrivy } from "@privy-io/expo";
 import { router } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
