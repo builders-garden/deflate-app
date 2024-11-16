@@ -73,25 +73,26 @@ export function KYC({ formData, kycLink, onSubmitKyc }: KYCProps) {
           </View>
         </View>
       )}
-      {kycLink.kycStatus === KycStatus.PENDING && (
-        <View className="bg-[#3B2086] rounded-[20px] p-4 flex-row items-center mb-6">
-          <Image
-            source={require("@/assets/images/hourglass.png")}
-            className="h-[48px] w-[48px] mr-3"
-          />
-          <View>
-            <DeflateText
-              text="Pending"
-              className="text-[24px] text-white"
-              font="BG_Bold"
+      {kycLink.kycStatus !== KycStatus.REJECTED &&
+        kycLink.kycStatus !== KycStatus.APPROVED && (
+          <View className="bg-[#3B2086] rounded-[20px] p-4 flex-row items-center mb-6">
+            <Image
+              source={require("@/assets/images/hourglass.png")}
+              className="h-[48px] w-[48px] mr-3"
             />
-            <DeflateText
-              text="Verification can take up to 2 days"
-              className="text-[16px] text-white"
-            />
+            <View>
+              <DeflateText
+                text={kycLink.kycStatus}
+                className="text-[24px] text-white capitalize"
+                font="BG_Bold"
+              />
+              <DeflateText
+                text="Verification can take up to 2 days"
+                className="text-[16px] text-white"
+              />
+            </View>
           </View>
-        </View>
-      )}
+        )}
       {kycLink.kycStatus === KycStatus.REJECTED && (
         <View className="bg-[#3B2086] rounded-[20px] p-4 flex-row items-center mb-6">
           <Image
@@ -118,7 +119,7 @@ export function KYC({ formData, kycLink, onSubmitKyc }: KYCProps) {
             className="text-[16px] text-[#556FC5]/50"
           />
           <DeflateText
-            text={formData.fullName}
+            text={formData?.fullName}
             className="text-[24px] text-[#3B2086]"
             font="BG_Bold"
           />
