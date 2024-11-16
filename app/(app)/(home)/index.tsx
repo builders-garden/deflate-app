@@ -96,9 +96,9 @@ export default function HomeScreen() {
       console.log(`opening ${redirectUrl}`);
       const result = await WebBrowser.openBrowserAsync(redirectUrl.toString());
 
-      if (result.type === WebBrowser.WebBrowserResultType.CANCEL) {
-        await deposit({ amount: 5 });
-      }
+      // if (result.type === WebBrowser.WebBrowserResultType.CANCEL) {
+      //   await deposit({ amount: 5 });
+      // }
     } catch (error) {
       console.error(error);
     }
@@ -240,7 +240,18 @@ export default function HomeScreen() {
               <View className="flex flex-row justify-evenly gap-x-4 w-full mt-4 px-4">
                 {chartOptions.map((option) => (
                   <TouchableOpacity
-                    onPress={() => setChartRange(option)}
+                    onPress={() => {
+                      setChartRange(option);
+                      refetchValueChart(
+                        option === "1d"
+                          ? ONE_INCH_TIMERANGE["1d"]
+                          : option === "1w"
+                          ? ONE_INCH_TIMERANGE["1week"]
+                          : option === "1m"
+                          ? ONE_INCH_TIMERANGE["1month"]
+                          : ONE_INCH_TIMERANGE["1year"]
+                      );
+                    }}
                     className={
                       chartRange === option
                         ? "flex flex-col items-center justify-center p-[10px] bg-[#556FC5]/50 rounded-xl w-[50px]"

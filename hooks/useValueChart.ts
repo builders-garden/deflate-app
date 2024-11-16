@@ -26,6 +26,7 @@ export function useValueChart(timerange: ONE_INCH_TIMERANGE) {
       setValueChart(response);
       return response;
     } catch (err) {
+      console.error(err);
       setError(
         err instanceof Error ? err : new Error("Failed to fetch value chart")
       );
