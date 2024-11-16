@@ -13,7 +13,7 @@ export function useProfitAndLoss(timerange: ONE_INCH_TIMERANGE) {
   const [profitAndLoss, setProfitAndLoss] =
     useState<ProfitAndLossResponse | null>(null);
 
-  const fetchProfitAndLoss = async () => {
+  const fetchProfitAndLoss = async (tr: ONE_INCH_TIMERANGE = timerange) => {
     try {
       setIsLoading(true);
       setError(null);
@@ -21,7 +21,7 @@ export function useProfitAndLoss(timerange: ONE_INCH_TIMERANGE) {
       const token = await getAccessToken();
       if (!token) throw new Error("No authentication token found");
 
-      const response = await getProfitAndLoss({ token, timerange });
+      const response = await getProfitAndLoss({ token, timerange: tr });
       setProfitAndLoss(response);
       return response;
     } catch (err) {
