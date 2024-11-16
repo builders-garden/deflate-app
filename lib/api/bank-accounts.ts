@@ -43,22 +43,17 @@ export enum BankAccountType {
  * @dev get a bank account by id
  * @returns {Promise<BankAccount>} the bank account from server
  */
-export const getBankAccountById = async ({
-  bankAccountId,
+export const getBankAccount = async ({
   token,
 }: {
   token: string;
-  bankAccountId: string;
 }): Promise<BankAccount> =>
   ky
-    .get(
-      `${process.env.EXPO_PUBLIC_BASE_API}/v1/bank-accounts/${bankAccountId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    )
+    .get(`${process.env.EXPO_PUBLIC_BASE_API}/v1/bank-accounts`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
     .json<BankAccount>();
 
 /**
@@ -92,19 +87,14 @@ export const createBankAccount = async ({
  * @returns {Promise<{message: string}>} acknowledgement from server
  */
 export const deleteBankAccount = async ({
-  bankAccountId,
   token,
 }: {
   token: string;
-  bankAccountId: string;
 }): Promise<{ message: string }> =>
   ky
-    .delete(
-      `${process.env.EXPO_PUBLIC_BASE_API}/v1/bank-accounts/${bankAccountId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    )
+    .delete(`${process.env.EXPO_PUBLIC_BASE_API}/v1/bank-accounts`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
     .json<{ message: string }>();
