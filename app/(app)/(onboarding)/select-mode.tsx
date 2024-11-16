@@ -1,7 +1,7 @@
 import { DeflateButton } from "@/components/deflate-button";
 import { DeflateText } from "@/components/deflate-text";
 import { useUpdateUser } from "@/hooks/useUpdateUser";
-import { usePrivy } from "@privy-io/expo";
+import { isNotCreated, useEmbeddedWallet, usePrivy } from "@privy-io/expo";
 import { router } from "expo-router";
 import { useState } from "react";
 import { Text, View } from "react-native";
@@ -13,6 +13,7 @@ export default function SelectModeScreen() {
     (user?.custom_metadata?.mode as string) || "safe"
   );
   const { updateUser } = useUpdateUser();
+  const wallet = useEmbeddedWallet();
 
   return (
     <SafeAreaView className="bg-[#B6BCF9] h-screen flex flex-col justify-between px-[32px]">
@@ -92,7 +93,16 @@ export default function SelectModeScreen() {
           if (selectedMode === "safe") {
             updateUser({ mode: "safe" })
               .then(() => {
-                router.push("/(app)/(home)");
+                if (isNotCreated(wallet)) {
+                  wallet
+                    .create({ recoveryMethod: "privy" })
+                    .then(() => {
+                      router.push("/(app)/(home)");
+                    })
+                    .catch(() => {});
+                } else {
+                  router.push("/(app)/(home)");
+                }
               })
               .catch(() => {});
           } else {
