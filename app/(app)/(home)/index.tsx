@@ -17,7 +17,7 @@ import { useDeposit } from "@/hooks/useDeposit";
 import { useBiconomySmartAccount } from "@/hooks/useBiconomySmartAccount";
 import { useUpdateUser } from "@/hooks/useUpdateUser";
 import Spinner from "react-native-loading-spinner-overlay";
-import { createSession } from "@/lib/api/sessions";
+import { useCreateSession } from "@/hooks/useCreateSession";
 
 const lineData = [
   { value: 0 },
@@ -39,6 +39,7 @@ export default function HomeScreen() {
   const [isWalletInitialized, setIsWalletInitialized] = useState(false);
   const { fetchSmartAccount, smartAccount } = useBiconomySmartAccount();
   const { deposit } = useDeposit();
+  const { createSession } = useCreateSession();
   const [isDepositLoading, setIsDepositLoading] = useState<boolean>(false);
   const [isWithdrawLoading, setIsWithdrawLoading] = useState<boolean>(false);
 
