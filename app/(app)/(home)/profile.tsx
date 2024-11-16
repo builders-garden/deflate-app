@@ -73,25 +73,27 @@ export default function ProfileScreen() {
               </View>
             </View>
           </TouchableOpacity>
-          <View className="flex flex-row items-center gap-x-4">
-            <Image
-              source={require("@/assets/images/banknote.png")}
-              height={48}
-              width={48}
-              className="h-[48px] w-[48px]"
-            />
-            <View className="flex flex-col">
-              <DeflateText
-                text="Bank Account"
-                className="text-[24px] text-[#3B2086]"
-                font="BG_Bold"
+          <TouchableOpacity onPress={() => router.push("/bank-account")}>
+            <View className="flex flex-row items-center gap-x-4">
+              <Image
+                source={require("@/assets/images/banknote.png")}
+                height={48}
+                width={48}
+                className="h-[48px] w-[48px]"
               />
-              <DeflateText
-                text="Change your connected account"
-                className="text-[16px] text-[#3B2086] tracking-normal"
-              />
+              <View className="flex flex-col">
+                <DeflateText
+                  text="Bank Account"
+                  className="text-[24px] text-[#3B2086]"
+                  font="BG_Bold"
+                />
+                <DeflateText
+                  text="Change your connected account"
+                  className="text-[16px] text-[#3B2086] tracking-normal"
+                />
+              </View>
             </View>
-          </View>
+          </TouchableOpacity>
         </View>
         <TouchableOpacity
           onPress={async () => {

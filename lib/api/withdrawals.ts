@@ -2,12 +2,14 @@ import ky from "ky";
 
 export interface WithdrawalsResponse {
   data: {
+    id: string;
     currency: string;
     amount: string;
     createdAt: string;
     receipt: {
       outgoingAmount: string;
     };
+    status: string;
   }[];
   count: number;
 }
