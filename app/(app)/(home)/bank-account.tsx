@@ -51,24 +51,25 @@ export default function BankAccountScreen() {
           />
         </TouchableOpacity>
 
-        <View className="flex-1 flex flex-col gap-6">
+        <View className="flex-1 flex flex-col gap-y-4">
           {!bankAccount ? (
             <>
-              <DeflateText
-                text="Setup your bank account"
-                className="text-[36px] text-[#3B2086] mb-2"
-                font="BG_ExtraBold"
-              />
-              <DeflateText
-                text="It will be used for withdrawals only"
-                className="text-[20px] text-[#3B2086] mb-6"
-              />
+              <View>
+                <DeflateText
+                  text="Setup your bank account"
+                  className="text-[36px] text-[#3B2086] mb-2"
+                  font="BG_ExtraBold"
+                />
+                <DeflateText
+                  text="It will be used for withdrawals only"
+                  className="text-[20px] text-[#3B2086] mb-6"
+                />
+              </View>
               <DeflateInput
                 placeholder="IBAN"
                 value={iban}
                 onValueChange={setIban}
               />
-              <View className="h-4" />
               <DeflateInput
                 placeholder="BIC / SWIFT code"
                 value={bic}
