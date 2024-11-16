@@ -122,6 +122,29 @@ export default function ProfileScreen() {
               </View>
             </View>
           </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => router.push("/(app)/(onboarding)/select-mode")}
+          >
+            <View className="flex flex-row items-center gap-x-4">
+              <Image
+                source={require("@/assets/images/banknote.png")}
+                height={48}
+                width={48}
+                className="h-[48px] w-[48px]"
+              />
+              <View className="flex flex-col">
+                <DeflateText
+                  text="Change mode"
+                  className="text-[24px] text-[#3B2086]"
+                  font="BG_Bold"
+                />
+                <DeflateText
+                  text="Switch to another saving mode"
+                  className="text-[16px] text-[#3B2086] tracking-normal"
+                />
+              </View>
+            </View>
+          </TouchableOpacity>
         </View>
         <TouchableOpacity
           onPress={async () => {

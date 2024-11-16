@@ -10,6 +10,9 @@ export const useUpdateUser = () => {
   const updateUserMutation = async (data: {
     username?: string;
     mode?: string;
+    answer1?: string;
+    answer2?: string;
+    answer3?: string;
   }) => {
     setIsLoading(true);
     setError(null);
@@ -22,7 +25,6 @@ export const useUpdateUser = () => {
         token,
         data,
       });
-
       return updatedUser;
     } catch (err) {
       setError(err instanceof Error ? err : new Error("Failed to update user"));

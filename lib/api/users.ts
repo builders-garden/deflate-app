@@ -9,6 +9,9 @@ export const updateUser = async ({
   data: {
     username?: string;
     mode?: string;
+    answer1?: string;
+    answer2?: string;
+    answer3?: string;
   };
 }) => {
   return ky
