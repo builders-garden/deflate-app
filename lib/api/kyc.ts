@@ -32,7 +32,7 @@ export interface KycLinkResponse {
  * @dev get a new kyc link
  * @returns {Promise<KycLinkResponse>} the kyc link response from server
  */
-export const getKYCLink = async ({
+export const getNewKYCLink = async ({
   data: { fullName, address, city, postalCode, country },
   token,
 }: {
@@ -61,18 +61,16 @@ export const getKYCLink = async ({
     .json<KycLinkResponse>();
 
 /**
- * @dev get a kyc link by id, used to check status
+ * @dev get a kyc link, used to check status
  * @returns {Promise<KycLinkResponse>} the kyc link response from server
  */
-export const getKYCLinkById = async ({
-  kycLinkId,
+export const getKYCLink = async ({
   token,
 }: {
   token: string;
-  kycLinkId: string;
 }): Promise<KycLinkResponse> =>
   ky
-    .get(`${process.env.EXPO_PUBLIC_BASE_API}/v1/kyc/${kycLinkId}`, {
+    .get(`${process.env.EXPO_PUBLIC_BASE_API}/v1/kyc`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

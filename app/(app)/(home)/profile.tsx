@@ -13,9 +13,9 @@ export default function ProfileScreen() {
         <TouchableOpacity onPress={() => router.back()}>
           <Image
             source={require("@/assets/images/close.png")}
-            height={36}
-            width={36}
-            className="h-[36px] w-[36px]"
+            height={24}
+            width={24}
+            className="h-[24px] w-[24px]"
           />
         </TouchableOpacity>
         <View className="flex flex-col items-center justify-center">
@@ -52,25 +52,27 @@ export default function ProfileScreen() {
           </View>
         </View>
         <View className="w-full rounded-[20px] border-4 border-[#3B2086] p-4 flex flex-col gap-y-6">
-          <View className="flex flex-row items-center gap-x-4">
-            <Image
-              source={require("@/assets/images/identity.png")}
-              height={48}
-              width={48}
-              className="h-[48px] w-[48px]"
-            />
-            <View className="flex flex-col">
-              <DeflateText
-                text="Identity Verification"
-                className="text-[24px] text-[#3B2086]"
-                font="BG_Bold"
+          <TouchableOpacity onPress={() => router.push("/kyc")}>
+            <View className="flex flex-row items-center gap-x-4">
+              <Image
+                source={require("@/assets/images/identity.png")}
+                height={48}
+                width={48}
+                className="h-[48px] w-[48px]"
               />
-              <DeflateText
-                text="Verify your identity"
-                className="text-[16px] text-[#3B2086] tracking-normal"
-              />
+              <View className="flex flex-col">
+                <DeflateText
+                  text="Identity Verification"
+                  className="text-[24px] text-[#3B2086]"
+                  font="BG_Bold"
+                />
+                <DeflateText
+                  text="Verify your identity"
+                  className="text-[16px] text-[#3B2086] tracking-normal"
+                />
+              </View>
             </View>
-          </View>
+          </TouchableOpacity>
           <View className="flex flex-row items-center gap-x-4">
             <Image
               source={require("@/assets/images/banknote.png")}
