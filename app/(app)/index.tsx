@@ -8,8 +8,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function LoginScreen() {
   const { login } = useLogin();
   const { user, isReady } = usePrivy();
+  console.log(isReady, user);
 
-  if (!isReady) {
+  if (!isReady && !user) {
     return (
       <SafeAreaView className="bg-[#B6BCF9] h-screen flex flex-col items-center justify-center px-[32px]">
         <ActivityIndicator color={"#3B2086"} size="large" />
@@ -17,8 +18,12 @@ export default function LoginScreen() {
     );
   }
 
-  if (isReady && user) {
-    return <Redirect href={"/(onboarding)"} />;
+  if (user) {
+    if (!user.custom_metadata || !user.custom_metadata.username) {
+      return <Redirect href={"/(onboarding)"} />;
+    }
+
+    return <Redirect href={"/(home)"} />;
   }
 
   return (

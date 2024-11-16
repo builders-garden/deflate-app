@@ -12,28 +12,46 @@ export default function ProfileScreen() {
       <SafeAreaView className="bg-[#B6BCF9] h-screen flex flex-col px-[24px]">
         <TouchableOpacity
           onPress={() => router.back()}
-          className="h-[24px] w-[24px]"
+          className="h-[36px] w-[36px]"
         >
           <Image
-            source={require("@/assets/images/close.png")}
+            source={require("@/assets/images/left-arrow.png")}
             height={24}
             width={24}
-            className="h-[24px] w-[24px]"
+            className="h-[36px] w-[36px]"
           />
         </TouchableOpacity>
         <View className="flex flex-col items-center justify-center">
           <View className="rounded-full h-[90px] w-[90px] bg-[#556FC5]/50 flex items-center justify-center">
-            <DeflateText text="L" className="text-[54px] text-[#3B2086]" />
+            <DeflateText
+              text={user!
+                .custom_metadata!.username.toString()
+                .charAt(0)
+                .toUpperCase()}
+              className="text-[54px] text-[#3B2086]"
+              font="BG_Bold"
+            />
           </View>
-          <DeflateText
-            text="Simone Staffa"
-            className="text-[36px] text-[#3B2086]"
-            font="BG_SemiBold"
-          />
-          <DeflateText
-            text="@limone"
-            className="text-[24px] text-[#556FC5]/50 mb-8"
-          />
+          {!user?.custom_metadata?.fullName && (
+            <DeflateText
+              text={user!.custom_metadata!.username.toString()}
+              className="text-[36px] text-[#3B2086]"
+              font="BG_SemiBold"
+            />
+          )}
+          {user?.custom_metadata?.fullName && (
+            <>
+              <DeflateText
+                text={user!.custom_metadata!.fullName.toString()}
+                className="text-[36px] text-[#3B2086]"
+                font="BG_SemiBold"
+              />
+              <DeflateText
+                text={`@${user!.custom_metadata!.username.toString()}`}
+                className="text-[24px] text-[#556FC5]/50 mb-8"
+              />
+            </>
+          )}
           <TouchableOpacity
             onPress={() => {
               router.push("/(app)/(home)/invite");

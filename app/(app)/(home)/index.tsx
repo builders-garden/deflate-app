@@ -1,8 +1,20 @@
 import { DeflateText } from "@/components/deflate-text";
 import { usePrivy } from "@privy-io/expo";
 import { Redirect, router } from "expo-router";
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import { Dimensions, Image, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { LineChart } from "react-native-gifted-charts";
+
+const lineData = [
+  { value: 0 },
+  { value: 10 },
+  { value: 8 },
+  { value: 58 },
+  { value: 56 },
+  { value: 78 },
+  { value: 74 },
+  { value: 98 },
+];
 
 export default function HomeScreen() {
   const { user, isReady } = usePrivy();
@@ -16,7 +28,14 @@ export default function HomeScreen() {
       <SafeAreaView className="bg-[#B6BCF9] h-screen flex flex-col justify-between px-[24px]">
         <TouchableOpacity onPress={() => router.push("/(app)/(home)/profile")}>
           <View className="rounded-full h-[64px] w-[64px] bg-[#556FC5]/50 flex items-center justify-center">
-            <DeflateText text="L" className="text-[36px] text-[#3B2086]" />
+            <DeflateText
+              text={user!
+                .custom_metadata!.username.toString()
+                .charAt(0)
+                .toUpperCase()}
+              className="text-[36px] text-[#3B2086]"
+              font="BG_Bold"
+            />
           </View>
         </TouchableOpacity>
         <View className="flex flex-col items-center justify-center">
@@ -71,6 +90,29 @@ export default function HomeScreen() {
                 />
               </View>
             </View>
+          </View>
+          <View className="w-full">
+            <LineChart
+              curved
+              data={lineData}
+              height={150}
+              width={Dimensions.get("screen").width}
+              isAnimated
+              animateOnDataChange
+              animationDuration={1000}
+              onDataChangeAnimationDuration={300}
+              // adjustToWidth
+              showVerticalLines={false}
+              showReferenceLine1={false}
+              thickness={4}
+              color1="#3B2086"
+              textColor1="#3B2086"
+              hideDataPoints
+              dataPointsColor1="#3B2086"
+              startFillColor1="#3B2086"
+              startOpacity={1}
+              hideAxesAndRules
+            />
           </View>
         </View>
         <View className="bg-white rounded-[20px] w-full h-[86px] flex flex-row items-center px-5">

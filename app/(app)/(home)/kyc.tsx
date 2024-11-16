@@ -8,6 +8,7 @@ import { TOS } from "@/components/kyc/tos";
 import { KYC } from "@/components/kyc/kyc";
 import { KYCForm } from "@/components/kyc/kyc-form";
 import { usePrivy } from "@privy-io/expo";
+import DeflateLoading from "@/components/deflate-loading";
 
 export default function KYCScreen() {
   const { user } = usePrivy();
@@ -25,6 +26,10 @@ export default function KYCScreen() {
     postalCode: "",
     country: "",
   });
+
+  if (isLoading) {
+    return <DeflateLoading />;
+  }
 
   return (
     <SafeAreaView className="bg-[#B6BCF9] h-screen-safe-offset-5">
