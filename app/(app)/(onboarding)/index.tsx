@@ -4,16 +4,21 @@ import { DeflateText } from "@/components/deflate-text";
 import { useUpdateUser } from "@/hooks/useUpdateUser";
 import { usePrivy } from "@privy-io/expo";
 import { router } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function OnboardingScreen() {
-  const { user } = usePrivy();
+  const { user, getAccessToken } = usePrivy();
   const [username, setUsername] = useState<string>("");
   const [referrer, setReferrer] = useState<string>("");
   const { updateUser, isLoading } = useUpdateUser();
 
+  useEffect(() => {
+    getAccessToken().then((token) => {
+      console.log(token);
+    });
+  }, []);
   return (
     <SafeAreaView className="bg-[#B6BCF9] h-screen flex flex-col justify-between px-[32px]">
       <View className="flex flex-col">
