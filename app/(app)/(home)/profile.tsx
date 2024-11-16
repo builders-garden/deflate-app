@@ -127,7 +127,7 @@ export default function ProfileScreen() {
           >
             <View className="flex flex-row items-center gap-x-4">
               <Image
-                source={require("@/assets/images/banknote.png")}
+                source={require("@/assets/images/refresh.png")}
                 height={48}
                 width={48}
                 className="h-[48px] w-[48px]"
