@@ -80,6 +80,7 @@ export default function HomeScreen() {
       redirectUrl.searchParams.append("message", message as string);
       redirectUrl.searchParams.append("address", userWalletAddress as string);
 
+      console.log(`opening ${redirectUrl}`);
       await WebBrowser.openBrowserAsync(redirectUrl.toString());
     } catch (error) {
       console.error(error);
