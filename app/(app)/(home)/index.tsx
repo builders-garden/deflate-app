@@ -1,6 +1,6 @@
 import { DeflateText } from "@/components/deflate-text";
-import Privy, { InMemoryCache } from "@privy-io/js-sdk-core";
 import { isNotCreated, useEmbeddedWallet, usePrivy } from "@privy-io/expo";
+import Privy, { InMemoryCache } from "@privy-io/js-sdk-core";
 import { Redirect, router } from "expo-router";
 import { Dimensions, Image, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -23,10 +23,10 @@ const lineData = [
   { value: 98 },
 ];
 
-const chartOptions = ["4h", "24h", "3d", "7d", "30d", "All"];
+const chartOptions = ["1d", "1w", "1m", "1y"];
 
 export default function HomeScreen() {
-  const { user, isReady } = usePrivy();
+  const { user, isReady, getAccessToken } = usePrivy();
   const wallet = useEmbeddedWallet();
 
   const [chartData, setChartData] = useState<any[]>(lineData);
@@ -34,6 +34,12 @@ export default function HomeScreen() {
   const [mode, setMode] = useState<string>(
     user?.custom_metadata?.mode?.toString() || "safe"
   );
+
+  useEffect(() => {
+    getAccessToken().then((token) => {
+      console.log(token);
+    });
+  }, []);
 
   const bottomSheetRef = useRef<BottomSheetModal>(null);
 
