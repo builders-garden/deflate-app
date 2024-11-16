@@ -8,7 +8,7 @@ import { Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function SelectModeScreen() {
-  const { user } = usePrivy();
+  const { user, getAccessToken } = usePrivy();
   const [selectedMode, setSelectedMode] = useState<string>(
     (user?.custom_metadata?.mode as string) || "safe"
   );
@@ -88,23 +88,17 @@ export default function SelectModeScreen() {
       <DeflateButton
         text="Continue"
         className="w-full text-center"
-        textClassName="text-[24px]"
-        onPress={() => {
+        textClassName="text-[24px] text-white"
+        onPress={async () => {
           if (selectedMode === "safe") {
-            updateUser({ mode: "safe" })
-              .then(() => {
-                if (isNotCreated(wallet)) {
-                  wallet
-                    .create({ recoveryMethod: "privy" })
-                    .then(() => {
-                      router.push("/(app)/(home)");
-                    })
-                    .catch(() => {});
-                } else {
-                  router.push("/(app)/(home)");
-                }
-              })
-              .catch(() => {});
+            await updateUser({ mode: "safe" });
+            await getAccessToken();
+            if (isNotCreated(wallet)) {
+              await wallet.create({ recoveryMethod: "privy" });
+              router.push("/(app)/(home)");
+            } else {
+              router.push("/(app)/(home)");
+            }
           } else {
             router.push("/(app)/(onboarding)/advanced-mode");
           }

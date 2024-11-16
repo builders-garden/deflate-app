@@ -25,6 +25,8 @@
     "@gorhom/bottom-sheet": "^5.0.5",
     "@privy-io/expo": "^0.33.1",
     "@privy-io/expo-native-extensions": "^0.0.3",
+    "@privy-io/js-sdk-core": "^0.34.1",
+    "@react-native-community/netinfo": "11.3.1",
     "@react-navigation/native": "^6.0.2",
     "expo": "~51.0.28",
     "expo-application": "~5.9.1",
