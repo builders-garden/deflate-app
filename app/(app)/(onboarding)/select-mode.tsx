@@ -10,8 +10,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function SelectModeScreen() {
   const { user } = usePrivy();
   const [selectedMode, setSelectedMode] = useState<string>(
-    user?.custom_metadata?.mode as string || "safe"
+    (user?.custom_metadata?.mode as string) || "safe"
   );
+  const { updateUser } = useUpdateUser();
 
   return (
     <SafeAreaView className="bg-[#B6BCF9] h-screen flex flex-col justify-between px-[32px]">
