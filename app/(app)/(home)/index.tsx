@@ -1,12 +1,6 @@
 import { DeflateText } from "@/components/deflate-text";
-import {
-  getAccessToken,
-  isNotCreated,
-  useEmbeddedWallet,
-  usePrivy,
-} from "@privy-io/expo";
-import Privy, { InMemoryCache } from "@privy-io/js-sdk-core";
 import { isNotCreated, useEmbeddedWallet, usePrivy } from "@privy-io/expo";
+import Privy, { InMemoryCache } from "@privy-io/js-sdk-core";
 import { Redirect, router } from "expo-router";
 import { Dimensions, Image, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
