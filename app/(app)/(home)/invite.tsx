@@ -9,12 +9,13 @@ import {
   Image,
   Share,
 } from "react-native";
-import { usePrivy } from "@privy-io/expo";
+import { useEmbeddedWallet, usePrivy } from "@privy-io/expo";
 import { useEffect, useState } from "react";
 
 export default function InviteFriendsScreen() {
   const { user } = usePrivy();
   const [invites, setInvites] = useState<number>(0);
+  const wallet = useEmbeddedWallet();
 
   useEffect(() => {
     getSignProtocolAttestationsCount();
@@ -23,9 +24,11 @@ export default function InviteFriendsScreen() {
   const getSignProtocolAttestationsCount = async () => {
     const indexService = new IndexService("testnet");
     const attestations = await indexService.queryAttestationList({
-      schemaId: "onchain_evm_84532_0x437",
+      schemaId: "onchain_evm_8453_0x77",
       attester: "0x538cFD76c4B97C5a87E1d5Eb2C7d026D08d34a81",
       page: 0,
+      mode: "onchain",
+      indexingValue: `deflate-${wallet.account?.address}`,
     });
     setInvites(attestations?.size || 0);
   };
