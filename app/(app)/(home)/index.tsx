@@ -1,10 +1,10 @@
 import { DeflateText } from "@/components/deflate-text";
-import { usePrivy } from "@privy-io/expo";
+import { isNotCreated, useEmbeddedWallet, usePrivy } from "@privy-io/expo";
 import { Redirect, router } from "expo-router";
 import { Dimensions, Image, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LineChart } from "react-native-gifted-charts";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
 import { DeflateBackdrop } from "@/components/deflate-backdrop";
 
@@ -23,6 +23,7 @@ const chartOptions = ["4h", "24h", "3d", "7d", "30d", "All"];
 
 export default function HomeScreen() {
   const { user, isReady } = usePrivy();
+  const wallet = useEmbeddedWallet();
 
   const [chartData, setChartData] = useState<any[]>(lineData);
   const [chartRange, setChartRange] = useState<string>(chartOptions[1]);
@@ -35,6 +36,12 @@ export default function HomeScreen() {
   const handlePresentModalPress = useCallback(() => {
     bottomSheetRef.current?.present();
   }, []);
+
+  useEffect(() => {
+    if (user && isNotCreated(wallet)) {
+      wallet.create({ recoveryMethod: "privy" });
+    }
+  }, [user]);
 
   if (!user && isReady) {
     return <Redirect href={"/"} />;
