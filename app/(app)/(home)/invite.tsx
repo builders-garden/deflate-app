@@ -25,7 +25,7 @@ export default function InviteFriendsScreen() {
     const indexService = new IndexService("testnet");
     const attestations = await indexService.queryAttestationList({
       schemaId: "onchain_evm_8453_0x77",
-      attester: "0x538cFD76c4B97C5a87E1d5Eb2C7d026D08d34a81",
+      attester: "0x8e251547f0fD650e0573711EF733F13eBA1505aD",
       page: 0,
       mode: "onchain",
       indexingValue: `deflate-${wallet.account?.address}`,
