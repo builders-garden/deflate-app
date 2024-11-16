@@ -7,11 +7,16 @@ import { useState } from "react";
 import { useFetchBankAccount } from "@/hooks/useFetchBankAccount";
 import { useCreateBankAccount } from "@/hooks/useCreateBankAccount";
 import { useDeleteBankAccount } from "@/hooks/useDeleteBankAccount";
+import { useFetchWithdrawals } from "@/hooks/useFetchWithdrawals";
 
 export default function BankAccountScreen() {
   const { bankAccount, isLoading, refetch } = useFetchBankAccount();
   const { deleteBankAccount, isLoading: isDeletingBankAccount } =
     useDeleteBankAccount();
+  const { withdrawals, isLoading: isLoadingWithdrawals } =
+    useFetchWithdrawals();
+  const [iban, setIban] = useState("");
+  const [bic, setBic] = useState("");
 
   const handleDisconnect = async () => {
     try {
@@ -50,7 +55,89 @@ export default function BankAccountScreen() {
           className="h-[36px] w-[36px] mb-6"
         />
       </TouchableOpacity>
-      <View className="flex-1 flex flex-col justify-center items-center"></View>
+      <View className="flex-1 flex flex-col">
+        {!bankAccount ? (
+          <>
+            <DeflateText
+              text="Setup your bank account"
+              className="text-[48px] text-[#3B2086] mb-2"
+              font="BG_ExtraBold"
+            />
+            <DeflateText
+              text="It will be used for withdrawals only"
+              className="text-[20px] text-[#3B2086] mb-6"
+            />
+            <DeflateInput
+              placeholder="IBAN"
+              value={iban}
+              onValueChange={setIban}
+            />
+            <View className="h-4" />
+            <DeflateInput
+              placeholder="BIC / SWIFT code"
+              value={bic}
+              onValueChange={setBic}
+            />
+            <View className="flex-1" />
+            <DeflateButton text="Confirm" className="mb-8" />
+          </>
+        ) : (
+          <>
+            <DeflateText
+              text="Bank account details"
+              className="text-[48px] text-[#3B2086] mb-2"
+              font="BG_ExtraBold"
+            />
+            <DeflateText
+              text="This is used for withdrawals only"
+              className="text-sm mb-6"
+            />
+
+            <View className="border-2 border-[#4E4B66] rounded-xl p-4 mb-6">
+              <DeflateText text="Beneficiary" className="text-sm mb-1" />
+              <DeflateText text={""} className="text-lg mb-4" />
+
+              <DeflateText text="IBAN" className="text-sm mb-1" />
+              <DeflateText text={"bankAccount.iban"} className="text-lg mb-4" />
+
+              <DeflateText text="BIC / SWIFT code" className="text-sm mb-1" />
+              <DeflateText text={"bankAccount.bic"} className="text-lg mb-4" />
+
+              <DeflateButton text="DISCONNECT" onPress={handleDisconnect} />
+            </View>
+
+            <DeflateText text="Withdrawal history" className="text-xl mb-2" />
+            <DeflateText
+              text="List of all withdrawals to your bank account"
+              className="text-sm mb-4"
+            />
+
+            {withdrawals?.data.map((withdrawal) => (
+              <View
+                key={withdrawal.id}
+                className="border-2 border-[#4E4B66] rounded-xl p-4 mb-4 flex-row justify-between items-center"
+              >
+                <DeflateText text={`$${withdrawal.amount}`} />
+                <View className="flex-row items-center gap-2">
+                  <DeflateText text={withdrawal.createdAt} />
+                  <View
+                    className={`px-2 py-1 rounded ${
+                      withdrawal.status === "PENDING"
+                        ? "bg-yellow-200"
+                        : "bg-green-200"
+                    }`}
+                  >
+                    <DeflateText
+                      text={withdrawal.status}
+                      className="text-sm uppercase"
+                    />
+                  </View>
+                </View>
+              </View>
+            ))}
+          </>
+        )}
+      </View>
     </SafeAreaView>
   );
 }
