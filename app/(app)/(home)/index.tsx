@@ -4,6 +4,7 @@ import { Redirect, router } from "expo-router";
 import { Dimensions, Image, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LineChart } from "react-native-gifted-charts";
+import { useState } from "react";
 
 const lineData = [
   { value: 0 },
@@ -16,8 +17,20 @@ const lineData = [
   { value: 98 },
 ];
 
+const chartOptions = ["4h", "24h", "3d", "7d", "30d", "All"];
+
 export default function HomeScreen() {
   const { user, isReady } = usePrivy();
+  const [chartData, setChartData] = useState<any[]>(lineData);
+  const [chartRange, setChartRange] = useState<string>(chartOptions[1]);
+
+  // useEffect(() => {
+  //   // shuffle chart data
+  //   const shuffledData = lineData.map((data) => ({
+  //     value: Math.floor(Math.random() * 10),
+  //   }));
+  //   setChartData(shuffledData);
+  // }, [chartRange]);
 
   if (!user && isReady) {
     return <Redirect href={"/"} />;
@@ -25,8 +38,11 @@ export default function HomeScreen() {
 
   return (
     <>
-      <SafeAreaView className="bg-[#B6BCF9] h-screen flex flex-col justify-between px-[24px]">
-        <TouchableOpacity onPress={() => router.push("/(app)/(home)/profile")}>
+      <SafeAreaView className="bg-[#B6BCF9] h-screen flex flex-col justify-between">
+        <TouchableOpacity
+          className="px-[24px]"
+          onPress={() => router.push("/(app)/(home)/profile")}
+        >
           <View className="rounded-full h-[64px] w-[64px] bg-[#556FC5]/50 flex items-center justify-center">
             <DeflateText
               text={user!
@@ -91,20 +107,24 @@ export default function HomeScreen() {
               </View>
             </View>
           </View>
-          <View className="w-full">
+          <View className="w-full py-4">
             <LineChart
               curved
-              data={lineData}
+              data={chartData}
               height={150}
-              width={Dimensions.get("screen").width}
+              initialSpacing={0}
+              yAxisSide={1}
+              yAxisIndicesWidth={0}
+              yAxisLabelWidth={0}
               isAnimated
               animateOnDataChange
               animationDuration={1000}
               onDataChangeAnimationDuration={300}
-              // adjustToWidth
+              adjustToWidth
+              parentWidth={Dimensions.get("screen").width}
               showVerticalLines={false}
               showReferenceLine1={false}
-              thickness={4}
+              thickness={5}
               color1="#3B2086"
               textColor1="#3B2086"
               hideDataPoints
@@ -113,21 +133,42 @@ export default function HomeScreen() {
               startOpacity={1}
               hideAxesAndRules
             />
+            <View className="flex flex-row justify-evenly gap-x-4 w-full mt-4 px-4">
+              {chartOptions.map((option) => (
+                <TouchableOpacity
+                  onPress={() => setChartRange(option)}
+                  className={
+                    chartRange === option
+                      ? "flex flex-col items-center justify-center p-[10px] bg-[#556FC5]/50 rounded-xl w-[50px]"
+                      : "flex flex-col items-center justify-center p-[10px] w-[50px]"
+                  }
+                  key={option}
+                >
+                  <DeflateText
+                    text={option}
+                    font="BG_Medium"
+                    className="text-[#3B2086] text-[16px]"
+                  />
+                </TouchableOpacity>
+              ))}
+            </View>
           </View>
         </View>
-        <View className="bg-white rounded-[20px] w-full h-[86px] flex flex-row items-center px-5">
-          <Text className="text-[48px] mr-3">😁</Text>
-          <View className="flex flex-col">
-            <DeflateText
-              text="Safe mode"
-              className="text-[20px]"
-              font="BG_Bold"
-            />
-            <DeflateText
-              text="Low-risk saving strategy"
-              className="text-[12px] text-[#8F8F91] tracking-normal"
-              font="BG_Medium"
-            />
+        <View className="px-[24px]">
+          <View className="bg-white rounded-[20px] w-full h-[86px] flex flex-row items-center px-5">
+            <Text className="text-[48px] mr-3">😁</Text>
+            <View className="flex flex-col">
+              <DeflateText
+                text="Safe mode"
+                className="text-[20px]"
+                font="BG_Bold"
+              />
+              <DeflateText
+                text="Low-risk saving strategy"
+                className="text-[12px] text-[#8F8F91] tracking-normal"
+                font="BG_Medium"
+              />
+            </View>
           </View>
         </View>
       </SafeAreaView>

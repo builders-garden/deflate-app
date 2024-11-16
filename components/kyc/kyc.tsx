@@ -16,8 +16,6 @@ interface KYCProps {
 }
 
 export function KYC({ formData, kycLink, onSubmitKyc }: KYCProps) {
-  console.log(kycLink);
-
   return (
     <View className="flex-1 flex flex-col">
       <DeflateText

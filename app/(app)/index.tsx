@@ -8,7 +8,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function LoginScreen() {
   const { login } = useLogin();
   const { user, isReady } = usePrivy();
-  console.log(isReady, user);
 
   if (!isReady && !user) {
     return (
