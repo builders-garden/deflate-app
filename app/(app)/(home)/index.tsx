@@ -15,6 +15,7 @@ import { useProfitAndLoss } from "@/hooks/useProfitAndLoss";
 import { ONE_INCH_TIMERANGE } from "@/lib/api/portfolio";
 import { useValueChart } from "@/hooks/useValueChart";
 import { useCurrentValue } from "@/hooks/useCurrentValue";
+import { useDeposit } from "@/hooks/useDeposit";
 
 const lineData = [
   { value: 0 },
@@ -32,9 +33,10 @@ const chartOptions = ["1d", "1w", "1m", "1y"];
 export default function HomeScreen() {
   const { user, isReady, getAccessToken } = usePrivy();
   const wallet = useEmbeddedWallet();
+  const { deposit } = useDeposit();
 
   const [chartData, setChartData] = useState<any[]>(lineData);
-  const [chartRange, setChartRange] = useState<string>(chartOptions[1]);
+  const [chartRange, setChartRange] = useState<string>("1w");
   const { data: pnl = { data: { roi: 0 } }, refetch } = useProfitAndLoss(
     ONE_INCH_TIMERANGE["1week"]
   );
@@ -92,11 +94,31 @@ export default function HomeScreen() {
       redirectUrl.searchParams.append("address", userWalletAddress as string);
 
       console.log(`opening ${redirectUrl}`);
-      await WebBrowser.openBrowserAsync(redirectUrl.toString());
+      const result = await WebBrowser.openBrowserAsync(redirectUrl.toString());
+
+      if (result.type === WebBrowser.WebBrowserResultType.CANCEL) {
+        await deposit({ amount: 5 });
+      }
     } catch (error) {
       console.error(error);
     }
   };
+
+  useEffect(() => {
+    try {
+      if (chartRange === "1d") {
+        refetchValueChart(ONE_INCH_TIMERANGE["1d"]);
+      } else if (chartRange === "1w") {
+        refetchValueChart(ONE_INCH_TIMERANGE["1week"]);
+      } else if (chartRange === "1m") {
+        refetchValueChart(ONE_INCH_TIMERANGE["1month"]);
+      } else {
+        refetchValueChart(ONE_INCH_TIMERANGE["1year"]);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }, [chartRange]);
 
   if (!user && isReady) {
     return <Redirect href={"/"} />;
