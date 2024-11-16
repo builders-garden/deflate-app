@@ -26,7 +26,7 @@ export default function OnboardingScreen() {
         />
         {username.length < 4 && (
           <DeflateText
-            text="Pick a username of at least 4 characters."
+            text="Username must be at least 4 characters long"
             className="text-[#3B2086] mt-2"
           />
         )}
