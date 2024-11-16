@@ -12,7 +12,9 @@ export function useValueChart(timerange: ONE_INCH_TIMERANGE) {
   const [error, setError] = useState<Error | null>(null);
   const [valueChart, setValueChart] = useState<ValueChartResponse | null>(null);
 
-  const fetchValueChart = async () => {
+  const fetchValueChart = async (
+    tr: ONE_INCH_TIMERANGE = ONE_INCH_TIMERANGE["1week"]
+  ) => {
     try {
       setIsLoading(true);
       setError(null);
@@ -20,7 +22,7 @@ export function useValueChart(timerange: ONE_INCH_TIMERANGE) {
       const token = await getAccessToken();
       if (!token) throw new Error("No authentication token found");
 
-      const response = await getValueChart({ token, timerange });
+      const response = await getValueChart({ token, timerange: tr });
       setValueChart(response);
       return response;
     } catch (err) {

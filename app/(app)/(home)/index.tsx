@@ -1,5 +1,5 @@
 import { DeflateText } from "@/components/deflate-text";
-import { isNotCreated, useEmbeddedWallet, usePrivy } from "@privy-io/expo";
+import { useEmbeddedWallet, usePrivy } from "@privy-io/expo";
 import Privy, { InMemoryCache } from "@privy-io/js-sdk-core";
 import { Redirect, router } from "expo-router";
 import { Dimensions, Image, Text, TouchableOpacity, View } from "react-native";
@@ -11,19 +11,24 @@ import { DeflateBackdrop } from "@/components/deflate-backdrop";
 import { base } from "viem/chains";
 import { createWalletClient, custom } from "viem";
 import * as WebBrowser from "expo-web-browser";
+import { useProfitAndLoss } from "@/hooks/useProfitAndLoss";
+import { ONE_INCH_TIMERANGE } from "@/lib/api/portfolio";
+import { useValueChart } from "@/hooks/useValueChart";
+import { useCurrentValue } from "@/hooks/useCurrentValue";
+import { useDeposit } from "@/hooks/useDeposit";
 import { initializeBiconomySmartAccount } from "@/lib/biconomy";
 import { useBiconomySmartAccount } from "@/hooks/useBiconomySmartAccount";
 import { useUpdateUser } from "@/hooks/useUpdateUser";
 
 const lineData = [
   { value: 0 },
-  { value: 10 },
-  { value: 8 },
-  { value: 58 },
-  { value: 56 },
-  { value: 78 },
-  { value: 74 },
-  { value: 98 },
+  { value: 0 },
+  { value: 0 },
+  { value: 0 },
+  { value: 0 },
+  { value: 0 },
+  { value: 0 },
+  { value: 0 },
 ];
 
 const chartOptions = ["1d", "1w", "1m", "1y"];
@@ -34,12 +39,20 @@ export default function HomeScreen() {
   const wallet = useEmbeddedWallet();
   const [isWalletInitialized, setIsWalletInitialized] = useState(false);
   const { fetchSmartAccount, smartAccount } = useBiconomySmartAccount();
+  const { deposit } = useDeposit();
 
   const [chartData, setChartData] = useState<any[]>(lineData);
-  const [chartRange, setChartRange] = useState<string>(chartOptions[1]);
-  const [mode, setMode] = useState<string>(
-    user?.custom_metadata?.mode?.toString() || "safe"
+  const [chartRange, setChartRange] = useState<string>("1w");
+  const { data: pnl = { data: { roi: 0 } }, refetch } = useProfitAndLoss(
+    ONE_INCH_TIMERANGE["1week"]
   );
+  const {
+    data: valueChart = [],
+    refetch: refetchValueChart,
+    error,
+  } = useValueChart(ONE_INCH_TIMERANGE["1week"]);
+  const { data: walletValue = { data: 0 }, refetch: refetchWalletValue } =
+    useCurrentValue();
 
   useEffect(() => {
     if (user && wallet?.account?.address && !isWalletInitialized) {
@@ -55,12 +68,6 @@ export default function HomeScreen() {
   const handlePresentModalPress = useCallback(() => {
     bottomSheetRef.current?.present();
   }, []);
-
-  useEffect(() => {
-    if (user && isNotCreated(wallet)) {
-      wallet.create({ recoveryMethod: "privy" });
-    }
-  }, [user]);
 
   const openDeposit = async () => {
     try {
@@ -95,11 +102,32 @@ export default function HomeScreen() {
       redirectUrl.searchParams.append("message", message as string);
       redirectUrl.searchParams.append("address", userWalletAddress as string);
 
-      await WebBrowser.openBrowserAsync(redirectUrl.toString());
+      console.log(`opening ${redirectUrl}`);
+      const result = await WebBrowser.openBrowserAsync(redirectUrl.toString());
+
+      if (result.type === WebBrowser.WebBrowserResultType.CANCEL) {
+        await deposit({ amount: 5 });
+      }
     } catch (error) {
       console.error(error);
     }
   };
+
+  useEffect(() => {
+    try {
+      if (chartRange === "1d") {
+        refetchValueChart(ONE_INCH_TIMERANGE["1d"]);
+      } else if (chartRange === "1w") {
+        refetchValueChart(ONE_INCH_TIMERANGE["1week"]);
+      } else if (chartRange === "1m") {
+        refetchValueChart(ONE_INCH_TIMERANGE["1month"]);
+      } else {
+        refetchValueChart(ONE_INCH_TIMERANGE["1year"]);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }, [chartRange]);
 
   if (!user && isReady) {
     return <Redirect href={"/"} />;
@@ -132,17 +160,29 @@ export default function HomeScreen() {
             className="text-[24px] text-[#3B2086]"
           />
           <DeflateText
-            text="$46,490"
+            text={`$${walletValue?.data || 0}`}
             className="text-[64px] text-[#3B2086]"
             font="BG_Bold"
           />
-          <View className="bg-white h-[32px] rounded-full flex items-center justify-center w-[100px]">
-            <DeflateText
-              text="+54%"
-              className="text-emerald-500 text-[24px]"
-              font="BG_Bold"
-            />
-          </View>
+          {pnl?.data?.roi && pnl?.data.roi > 0 ? (
+            <View className="bg-white h-[32px] rounded-full flex items-center justify-center w-[100px]">
+              <DeflateText
+                text={pnl?.data.roi.toString()}
+                className="text-emerald-500 text-[24px]"
+                font="BG_Bold"
+              />
+            </View>
+          ) : pnl?.data?.roi && pnl?.data.roi < 0 ? (
+            <View className="bg-white h-[32px] rounded-full flex items-center justify-center w-[100px]">
+              <DeflateText
+                text={pnl?.data.roi.toString()}
+                className="text-red-500 text-[24px]"
+                font="BG_Bold"
+              />
+            </View>
+          ) : (
+            <></>
+          )}
           <View className="flex flex-row items-center justify-center gap-x-8 mt-4">
             <View className="flex flex-col items-center justify-center">
               <View className="rounded-full flex items-center justify-center">
@@ -179,52 +219,54 @@ export default function HomeScreen() {
               </View>
             </View>
           </View>
-          <View className="w-full py-4">
-            <LineChart
-              curved
-              data={chartData}
-              height={150}
-              initialSpacing={0}
-              yAxisSide={1}
-              yAxisIndicesWidth={0}
-              yAxisLabelWidth={0}
-              isAnimated
-              animateOnDataChange
-              animationDuration={1000}
-              onDataChangeAnimationDuration={300}
-              adjustToWidth
-              parentWidth={Dimensions.get("screen").width}
-              showVerticalLines={false}
-              showReferenceLine1={false}
-              thickness={5}
-              color1="#3B2086"
-              textColor1="#3B2086"
-              hideDataPoints
-              dataPointsColor1="#3B2086"
-              startFillColor1="#3B2086"
-              startOpacity={1}
-              hideAxesAndRules
-            />
-            <View className="flex flex-row justify-evenly gap-x-4 w-full mt-4 px-4">
-              {chartOptions.map((option) => (
-                <TouchableOpacity
-                  onPress={() => setChartRange(option)}
-                  className={
-                    chartRange === option
-                      ? "flex flex-col items-center justify-center p-[10px] bg-[#556FC5]/50 rounded-xl w-[50px]"
-                      : "flex flex-col items-center justify-center p-[10px] w-[50px]"
-                  }
-                  key={option}
-                >
-                  <DeflateText
-                    text={option}
-                    font="BG_Medium"
-                    className="text-[#3B2086] text-[16px]"
-                  />
-                </TouchableOpacity>
-              ))}
+          {lineData && (
+            <View className="w-full py-4">
+              <LineChart
+                curved
+                data={chartData}
+                height={150}
+                initialSpacing={0}
+                yAxisSide={1}
+                yAxisIndicesWidth={0}
+                yAxisLabelWidth={0}
+                isAnimated
+                animateOnDataChange
+                animationDuration={1000}
+                onDataChangeAnimationDuration={300}
+                adjustToWidth
+                parentWidth={Dimensions.get("screen").width}
+                showVerticalLines={false}
+                showReferenceLine1={false}
+                thickness={5}
+                color1="#3B2086"
+                textColor1="#3B2086"
+                hideDataPoints
+                dataPointsColor1="#3B2086"
+                startFillColor1="#3B2086"
+                startOpacity={1}
+                hideAxesAndRules
+              />
+              <View className="flex flex-row justify-evenly gap-x-4 w-full mt-4 px-4">
+                {chartOptions.map((option) => (
+                  <TouchableOpacity
+                    onPress={() => setChartRange(option)}
+                    className={
+                      chartRange === option
+                        ? "flex flex-col items-center justify-center p-[10px] bg-[#556FC5]/50 rounded-xl w-[50px]"
+                        : "flex flex-col items-center justify-center p-[10px] w-[50px]"
+                    }
+                    key={option}
+                  >
+                    <DeflateText
+                      text={option}
+                      font="BG_Medium"
+                      className="text-[#3B2086] text-[16px]"
+                    />
+                  </TouchableOpacity>
+                ))}
+              </View>
             </View>
-          </View>
+          )}
         </View>
         {user?.custom_metadata?.mode === "advanced" ? (
           <TouchableOpacity

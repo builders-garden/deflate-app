@@ -11,11 +11,12 @@ interface KYCProps {
     postalCode: string;
     country: string;
   };
+  showData: boolean;
   kycLink: KycLinkResponse;
   onSubmitKyc: () => void;
 }
 
-export function KYC({ formData, kycLink, onSubmitKyc }: KYCProps) {
+export function KYC({ formData, kycLink, onSubmitKyc, showData }: KYCProps) {
   return (
     <View className="flex-1 flex flex-col">
       <DeflateText
@@ -118,7 +119,14 @@ export function KYC({ formData, kycLink, onSubmitKyc }: KYCProps) {
             className="text-[16px] text-[#556FC5]/50"
           />
           <DeflateText
-            text={formData?.fullName}
+            text={
+              showData
+                ? formData?.fullName
+                : formData?.fullName
+                    .split(" ")
+                    .map((word) => "*".repeat(word.length))
+                    .join(" ")
+            }
             className="text-[24px] text-[#3B2086]"
             font="BG_Bold"
           />
@@ -129,7 +137,7 @@ export function KYC({ formData, kycLink, onSubmitKyc }: KYCProps) {
             className="text-[16px] text-[#556FC5]/50"
           />
           <DeflateText
-            text={formData.address}
+            text={showData ? formData.address : "**********"}
             className="text-[24px] text-[#3B2086]"
             font="BG_Bold"
           />
@@ -137,7 +145,14 @@ export function KYC({ formData, kycLink, onSubmitKyc }: KYCProps) {
         <View className="mb-4">
           <DeflateText text="City" className="text-[16px] text-[#556FC5]/50" />
           <DeflateText
-            text={formData.city}
+            text={
+              showData
+                ? formData.city
+                : formData.city
+                    .split(" ")
+                    .map((word) => "*".repeat(word.length))
+                    .join(" ")
+            }
             className="text-[24px] text-[#3B2086]"
             font="BG_Bold"
           />
@@ -148,7 +163,14 @@ export function KYC({ formData, kycLink, onSubmitKyc }: KYCProps) {
             className="text-[16px] text-[#556FC5]/50"
           />
           <DeflateText
-            text={formData.postalCode}
+            text={
+              showData
+                ? formData.postalCode
+                : formData.postalCode
+                    .split(" ")
+                    .map((word) => "*".repeat(word.length))
+                    .join(" ")
+            }
             className="text-[24px] text-[#3B2086]"
             font="BG_Bold"
           />
@@ -159,7 +181,14 @@ export function KYC({ formData, kycLink, onSubmitKyc }: KYCProps) {
             className="text-[16px] text-[#556FC5]/50"
           />
           <DeflateText
-            text={formData.country}
+            text={
+              showData
+                ? formData.country
+                : formData.country
+                    .split(" ")
+                    .map((word) => "*".repeat(word.length))
+                    .join(" ")
+            }
             className="text-[24px] text-[#3B2086]"
             font="BG_Bold"
           />

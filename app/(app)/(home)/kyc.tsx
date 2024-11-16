@@ -18,6 +18,7 @@ export default function KYCScreen() {
     isLoading: isCreatingKYC,
     error: createKYCError,
   } = useCreateKYC();
+  const [showData, setShowData] = useState<boolean>(false);
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -34,17 +35,44 @@ export default function KYCScreen() {
   return (
     <SafeAreaView className="bg-[#B6BCF9] h-screen-safe-offset-5">
       <View className="flex flex-col px-[24px] h-full">
-        <TouchableOpacity
-          onPress={() => router.back()}
-          className="h-[36px] w-[36px] mb-4"
-        >
-          <Image
-            source={require("@/assets/images/left-arrow.png")}
-            height={36}
-            width={36}
-            className="h-[36px] w-[36px] mb-6"
-          />
-        </TouchableOpacity>
+        <View className="flex flex-row w-full justify-between items-center">
+          <TouchableOpacity
+            onPress={() => router.back()}
+            className="h-[36px] w-[36px] mb-4"
+          >
+            <Image
+              source={require("@/assets/images/left-arrow.png")}
+              height={36}
+              width={36}
+              className="h-[36px] w-[36px] mb-6"
+            />
+          </TouchableOpacity>
+          {showData ? (
+            <TouchableOpacity
+              onPress={() => setShowData(false)}
+              className="h-[36px] w-[36px] mb-4"
+            >
+              <Image
+                source={require("@/assets/images/eye-closed.png")}
+                height={36}
+                width={36}
+                className="h-[36px] w-[36px] mb-6"
+              />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              onPress={() => setShowData(true)}
+              className="h-[36px] w-[36px] mb-4"
+            >
+              <Image
+                source={require("@/assets/images/eye.png")}
+                height={36}
+                width={36}
+                className="h-[36px] w-[36px] mb-6"
+              />
+            </TouchableOpacity>
+          )}
+        </View>
         {kycLink && kycLink.tosStatus === TosStatus.PENDING && (
           <TOS
             tosLink={kycLink.tosLink}
@@ -65,6 +93,7 @@ export default function KYCScreen() {
           <KYC
             kycLink={kycLink}
             formData={user?.custom_metadata as typeof formData}
+            showData={showData}
             onSubmitKyc={async () => await fetchKYC()}
           />
         )}
