@@ -72,7 +72,8 @@ export function KYC({ formData, kycLink, onSubmitKyc }: KYCProps) {
         </View>
       )}
       {kycLink.kycStatus !== KycStatus.REJECTED &&
-        kycLink.kycStatus !== KycStatus.APPROVED && (
+        kycLink.kycStatus !== KycStatus.APPROVED &&
+        kycLink.kycStatus !== KycStatus.NOT_STARTED && (
           <View className="bg-[#3B2086] rounded-[20px] p-4 flex-row items-center mb-6">
             <Image
               source={require("@/assets/images/hourglass.png")}

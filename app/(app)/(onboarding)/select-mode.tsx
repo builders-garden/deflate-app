@@ -1,5 +1,6 @@
 import { DeflateButton } from "@/components/deflate-button";
 import { DeflateText } from "@/components/deflate-text";
+import { useUpdateUser } from "@/hooks/useUpdateUser";
 import { usePrivy } from "@privy-io/expo";
 import { router } from "expo-router";
 import { useState } from "react";
@@ -88,8 +89,11 @@ export default function SelectModeScreen() {
         textClassName="text-[24px]"
         onPress={() => {
           if (selectedMode === "safe") {
-            // go to home
-            router.push("/(app)/(home)");
+            updateUser({ mode: "safe" })
+              .then(() => {
+                router.push("/(app)/(home)");
+              })
+              .catch(() => {});
           } else {
             router.push("/(app)/(onboarding)/advanced-mode");
           }

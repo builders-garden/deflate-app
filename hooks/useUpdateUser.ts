@@ -13,6 +13,7 @@ export const useUpdateUser = () => {
     answer1?: string;
     answer2?: string;
     answer3?: string;
+    referrer?: string;
   }) => {
     setIsLoading(true);
     setError(null);

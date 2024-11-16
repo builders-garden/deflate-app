@@ -1,9 +1,35 @@
 import { DeflateButton } from "@/components/deflate-button";
 import { DeflateText } from "@/components/deflate-text";
 import { router } from "expo-router";
-import { SafeAreaView, TouchableOpacity, View, Image } from "react-native";
+import { IndexService } from "@ethsign/sp-sdk";
+import {
+  SafeAreaView,
+  TouchableOpacity,
+  View,
+  Image,
+  Share,
+} from "react-native";
+import { usePrivy } from "@privy-io/expo";
+import { useEffect, useState } from "react";
 
 export default function InviteFriendsScreen() {
+  const { user } = usePrivy();
+  const [invites, setInvites] = useState<number>(0);
+
+  useEffect(() => {
+    getSignProtocolAttestationsCount();
+  }, []);
+
+  const getSignProtocolAttestationsCount = async () => {
+    const indexService = new IndexService("testnet");
+    const attestations = await indexService.queryAttestationList({
+      schemaId: "onchain_evm_84532_0x437",
+      attester: "0x538cFD76c4B97C5a87E1d5Eb2C7d026D08d34a81",
+      page: 0,
+    });
+    setInvites(attestations?.size || 0);
+  };
+
   return (
     <SafeAreaView className="bg-[#3B2086] h-screen">
       <View className="flex flex-col h-full px-[24px] justify-between">
@@ -28,11 +54,11 @@ export default function InviteFriendsScreen() {
           </View>
           <View className="flex flex-col gap-2">
             <DeflateText
-              text="Your friends have to"
+              text="Your friends have to:"
               className="text-[20px] text-[#FFFFFF]"
             />
-            <View className="w-full rounded-[20px] bg-[#B6BCF9]/50 p-4 flex flex-col gap-y-6">
-              <View className="w-full rounded-[20px] flex flex-row items-center gap-x-4 mb-4">
+            <View className="w-full rounded-[20px] bg-[#B6BCF9]/50 p-4 flex flex-col items-center gap-y-6 py-6">
+              <View className="w-full rounded-[20px] flex flex-row items-center gap-x-4">
                 <Image
                   source={require("@/assets/images/link.png")}
                   height={48}
@@ -51,7 +77,7 @@ export default function InviteFriendsScreen() {
                   />
                 </View>
               </View>
-              <View className="w-full rounded-[20px] flex flex-row items-center gap-x-4 mb-4">
+              <View className="w-full rounded-[20px] flex flex-row items-center gap-x-4">
                 <Image
                   source={require("@/assets/images/money.png")}
                   height={48}
@@ -71,12 +97,25 @@ export default function InviteFriendsScreen() {
                 </View>
               </View>
             </View>
+            <DeflateText
+              text={`You have invited ${
+                invites > 5 ? "5" : invites
+              }/5 friends and earned $${
+                invites > 5 ? `25` : `${5 * invites}`
+              } so far!`}
+              className="text-[20px] text-[#FFFFFF]"
+            />
           </View>
         </View>
         <DeflateButton
           text="Invite friends"
-          textClassName="text-[#3B2086]"
+          textClassName="text-[#3B2086] text-[24px]"
           className="bg-[#FFFFFF]"
+          onPress={async () => {
+            await Share.share({
+              message: `Join Deflate using this link and get $5 on your first deposit: deflate://invite?ref=${user?.custom_metadata?.username}`,
+            });
+          }}
         />
       </View>
     </SafeAreaView>
