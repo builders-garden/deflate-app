@@ -5,6 +5,8 @@ import {
   useEmbeddedWallet,
   usePrivy,
 } from "@privy-io/expo";
+import Privy, { InMemoryCache } from "@privy-io/js-sdk-core";
+import { isNotCreated, useEmbeddedWallet, usePrivy } from "@privy-io/expo";
 import { Redirect, router } from "expo-router";
 import { Dimensions, Image, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -12,6 +14,9 @@ import { LineChart } from "react-native-gifted-charts";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
 import { DeflateBackdrop } from "@/components/deflate-backdrop";
+import { base } from "viem/chains";
+import { createWalletClient, custom } from "viem";
+import * as WebBrowser from "expo-web-browser";
 
 const lineData = [
   { value: 0 },
@@ -53,6 +58,45 @@ export default function HomeScreen() {
       wallet.create({ recoveryMethod: "privy" });
     }
   }, [user]);
+
+  const openDeposit = async () => {
+    try {
+      const userWalletAddress = wallet?.account?.address;
+      const privy = new Privy({
+        appId: process.env.EXPO_PUBLIC_PRIVY_APP_ID!,
+        storage: new InMemoryCache(),
+      });
+      const chainId = `eip155:8453`;
+
+      const { message } = await privy.auth.siwe.init(
+        {
+          chainId,
+          address: userWalletAddress!,
+        },
+        `${"deflate.builders.garden"}`,
+        "https://deflate.builders.garden"
+      );
+
+      const walletClient = createWalletClient({
+        chain: base,
+        transport: custom(await wallet.getProvider()),
+      });
+
+      const signature = await walletClient.signMessage({
+        message,
+        account: userWalletAddress as `0x${string}`,
+      });
+
+      const redirectUrl = new URL("https://deflate.builders.garden");
+      redirectUrl.searchParams.append("signature", signature as string);
+      redirectUrl.searchParams.append("message", message as string);
+      redirectUrl.searchParams.append("address", userWalletAddress as string);
+
+      await WebBrowser.openBrowserAsync(redirectUrl.toString());
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   if (!user && isReady) {
     return <Redirect href={"/"} />;
@@ -99,7 +143,7 @@ export default function HomeScreen() {
           <View className="flex flex-row items-center justify-center gap-x-8 mt-4">
             <View className="flex flex-col items-center justify-center">
               <View className="rounded-full flex items-center justify-center">
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => openDeposit()}>
                   <Image
                     source={require("@/assets/images/deposit.png")}
                     height={54}
@@ -179,7 +223,7 @@ export default function HomeScreen() {
             </View>
           </View>
         </View>
-        {user?.custom_metadata?.mode !== "advanced" ? (
+        {user?.custom_metadata?.mode === "advanced" ? (
           <TouchableOpacity
             onPress={() => handlePresentModalPress()}
             className="px-[24px]"
@@ -232,8 +276,48 @@ export default function HomeScreen() {
           enablePanDownToClose
           backdropComponent={DeflateBackdrop}
         >
-          <BottomSheetView className="h-[400px]">
-            <Text>Awesome 🎉</Text>
+          <BottomSheetView className="h-[400px] p-4">
+            {user?.custom_metadata?.mode === "safe" ? (
+              <View className="flex flex-col gap-y-4">
+                <DeflateText
+                  text="😁 Safe mode"
+                  className="text-[24px]"
+                  font="BG_Bold"
+                />
+                <Text className="text-[16px]">
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  Eaque, qui obcaecati. Reiciendis accusamus dicta ea eius
+                  facilis corrupti repellat ipsam voluptatibus ullam minima
+                  aspernatur facere consequuntur dolores earum, amet cupiditate.
+                </Text>
+                <Text className="text-[16px]">
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  Eaque, qui obcaecati. Reiciendis accusamus dicta ea eius
+                  facilis corrupti repellat ipsam voluptatibus ullam minima
+                  aspernatur facere consequuntur dolores earum, amet cupiditate.
+                </Text>
+              </View>
+            ) : (
+              <View className="flex flex-col gap-y-4">
+                <DeflateText
+                  text="⚡ Advanced mode"
+                  className="text-[24px]"
+                  font="BG_Bold"
+                />
+                <Text className="text-[16px]">
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  Eaque, qui obcaecati. Reiciendis accusamus dicta ea eius
+                  facilis corrupti repellat ipsam voluptatibus ullam minima
+                  aspernatur facere consequuntur dolores earum, amet cupiditate.
+                </Text>
+                <Text className="text-[16px]">
+                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  Eaque, qui obcaecati. Reiciendis accusamus dicta ea eius
+                  facilis corrupti repellat ipsam voluptatibus ullam minima
+                  aspernatur facere consequuntur dolores earum, amet cupiditate.
+                </Text>
+              </View>
+            )}
           </BottomSheetView>
         </BottomSheetModal>
       </SafeAreaView>
