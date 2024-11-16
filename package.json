@@ -15,7 +15,7 @@
     "preset": "jest-expo"
   },
   "dependencies": {
-    "@biconomy/sdk": "^0.0.7",
+    "@biconomy/sdk": "^0.0.10",
     "@dynamic-labs/client": "^4.0.0-alpha.32",
     "@dynamic-labs/react-native-extension": "^4.0.0-alpha.32",
     "@ethersproject/shims": "^5.7.0",
