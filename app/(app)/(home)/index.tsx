@@ -38,38 +38,38 @@ export default function HomeScreen() {
           </View>
           <View className="flex flex-row items-center justify-center gap-x-8 mt-4">
             <View className="flex flex-col items-center justify-center">
-              <TouchableOpacity>
-                <View className="rounded-full flex items-center justify-center">
+              <View className="rounded-full flex items-center justify-center">
+                <TouchableOpacity>
                   <Image
                     source={require("@/assets/images/deposit.png")}
                     height={54}
                     width={54}
                     className="h-[54px] w-[54px]"
                   />
-                  <DeflateText
-                    text="Deposit"
-                    className="text-[16px] text-[#3B2086] tracking-normal"
-                    font="BG_Medium"
-                  />
-                </View>
-              </TouchableOpacity>
+                </TouchableOpacity>
+                <DeflateText
+                  text="Deposit"
+                  className="text-[16px] text-[#3B2086] tracking-normal"
+                  font="BG_Medium"
+                />
+              </View>
             </View>
             <View className="flex flex-col items-center justify-center">
-              <TouchableOpacity>
-                <View className="rounded-full flex items-center justify-center">
+              <View className="rounded-full flex items-center justify-center">
+                <TouchableOpacity>
                   <Image
                     source={require("@/assets/images/withdraw.png")}
                     height={54}
                     width={54}
                     className="h-[54px] w-[54px]"
                   />
-                  <DeflateText
-                    text="Withdraw"
-                    className="text-[16px] text-[#3B2086] tracking-normal"
-                    font="BG_Medium"
-                  />
-                </View>
-              </TouchableOpacity>
+                </TouchableOpacity>
+                <DeflateText
+                  text="Withdraw"
+                  className="text-[16px] text-[#3B2086] tracking-normal"
+                  font="BG_Medium"
+                />
+              </View>
             </View>
           </View>
         </View>

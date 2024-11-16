@@ -21,7 +21,7 @@ export const DeflateInput = ({
         autoCapitalize="none"
         autoCorrect={false}
         autoComplete="off"
-        caretHidden={true}
+        // caretHidden={true}
       />
     </View>
   );

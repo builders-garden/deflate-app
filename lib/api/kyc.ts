@@ -55,6 +55,7 @@ export const getNewKYCLink = async ({
         country,
       },
       headers: {
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
     })

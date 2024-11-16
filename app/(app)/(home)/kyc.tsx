@@ -1,25 +1,23 @@
-import { DeflateText } from "@/components/deflate-text";
-import { DeflateButton } from "@/components/deflate-button";
-import { DeflateInput } from "@/components/deflate-input";
 import { useCreateKYC } from "@/hooks/useCreateKYC";
 import { useFetchKYC } from "@/hooks/useFetchKYC";
 import { router } from "expo-router";
-import { SafeAreaView, TouchableOpacity, Image, View } from "react-native";
+import { SafeAreaView, TouchableOpacity, Image } from "react-native";
 import { useState } from "react";
-import { KycStatus } from "@/lib/api/kyc";
+import { TosStatus } from "@/lib/api/kyc";
 import { TOS } from "@/components/kyc/tos";
 import { KYC } from "@/components/kyc/kyc";
 import { KYCForm } from "@/components/kyc/kyc-form";
+import { usePrivy } from "@privy-io/expo";
 
 export default function KYCScreen() {
-  const { kycLink, isLoading, error } = useFetchKYC();
+  const { user } = usePrivy();
+  const { kycLink, isLoading, error, fetchKYC } = useFetchKYC();
   const {
     createKYC,
     isLoading: isCreatingKYC,
     error: createKYCError,
   } = useCreateKYC();
 
-  const [tosAccepted, setTosAccepted] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
     address: "",
@@ -29,30 +27,41 @@ export default function KYCScreen() {
   });
 
   return (
-    <>
-      <SafeAreaView className="bg-[#B6BCF9] h-screen flex flex-col px-[48px]">
-        <TouchableOpacity onPress={() => router.back()}>
-          <Image
-            source={require("@/assets/images/left-arrow.png")}
-            height={36}
-            width={36}
-            className="h-[36px] w-[36px] mb-6"
-          />
-        </TouchableOpacity>
-        {!tosAccepted && !kycLink && (
-          <TOS onAccept={() => setTosAccepted(true)} />
-        )}
-        {tosAccepted && !kycLink && (
-          <KYCForm
-            formData={formData}
-            onSubmit={() => {}}
-            onValueChange={() => {}}
-          />
-        )}
-        {kycLink?.kycStatus === KycStatus.APPROVED && (
-          <KYC formData={formData} />
-        )}
-      </SafeAreaView>
-    </>
+    <SafeAreaView className="bg-[#B6BCF9] h-screen-safe-offset-5 flex flex-col mx-[24px] px-[24px]">
+      <TouchableOpacity
+        onPress={() => router.back()}
+        className="h-[36px] w-[36px] mb-4"
+      >
+        <Image
+          source={require("@/assets/images/left-arrow.png")}
+          height={36}
+          width={36}
+          className="h-[36px] w-[36px] mb-6"
+        />
+      </TouchableOpacity>
+      {kycLink && kycLink.tosStatus === TosStatus.PENDING && (
+        <TOS
+          tosLink={kycLink.tosLink}
+          onAccept={async () => await fetchKYC()}
+        />
+      )}
+      {!kycLink && (
+        <KYCForm
+          formData={formData}
+          onSubmit={async () => {
+            await createKYC(formData);
+            await fetchKYC();
+          }}
+          onValueChange={(value) => setFormData(value)}
+        />
+      )}
+      {kycLink && kycLink.tosStatus === TosStatus.APPROVED && (
+        <KYC
+          kycLink={kycLink}
+          formData={user?.custom_metadata as typeof formData}
+          onSubmitKyc={async () => await fetchKYC()}
+        />
+      )}
+    </SafeAreaView>
   );
 }

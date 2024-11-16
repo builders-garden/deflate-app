@@ -9,8 +9,11 @@ export default function ProfileScreen() {
 
   return (
     <>
-      <SafeAreaView className="bg-[#B6BCF9] h-screen flex flex-col px-[24px]">
-        <TouchableOpacity onPress={() => router.back()}>
+      <SafeAreaView className="bg-[#B6BCF9] h-screen flex flex-col px-[24px] px-[24px]">
+        <TouchableOpacity
+          onPress={() => router.back()}
+          className="h-[24px] w-[24px]"
+        >
           <Image
             source={require("@/assets/images/close.png")}
             height={24}
