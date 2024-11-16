@@ -23,7 +23,7 @@ const lineData = [
   { value: 98 },
 ];
 
-const chartOptions = ["4h", "24h", "3d", "7d", "30d", "All"];
+const chartOptions = ["1d", "1w", "1m", "1y"];
 
 export default function HomeScreen() {
   const { user, isReady, getAccessToken } = usePrivy();
