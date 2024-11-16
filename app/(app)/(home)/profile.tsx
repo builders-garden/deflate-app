@@ -34,28 +34,33 @@ export default function ProfileScreen() {
             text="@limone"
             className="text-[24px] text-[#556FC5]/50 mb-8"
           />
-          <View className="h-[86px] w-full rounded-[20px] p-4 bg-[#3B2086] flex flex-row items-center gap-x-4 mb-4">
-            <Image
-              source={require("@/assets/images/invite.png")}
-              height={48}
-              width={48}
-              className="h-[48px] w-[48px]"
-            />
-            <View className="flex flex-col">
-              <DeflateText
-                text="Invite friends"
-                className="text-[24px] text-white"
-                font="BG_Bold"
+          <TouchableOpacity
+            onPress={() => router.push("/(app)/(home)/invite")}
+            className="w-full"
+          >
+            <View className="h-[86px] w-full rounded-[20px] p-4 bg-[#3B2086] flex flex-row items-center gap-x-4 mb-4">
+              <Image
+                source={require("@/assets/images/invite.png")}
+                height={48}
+                width={48}
+                className="h-[48px] w-[48px]"
               />
-              <DeflateText
-                text="Earn $5 per invite (up to $25)"
-                className="text-[16px] text-white tracking-normal"
-              />
+              <View className="flex flex-col">
+                <DeflateText
+                  text="Invite friends"
+                  className="text-[24px] text-white"
+                  font="BG_Bold"
+                />
+                <DeflateText
+                  text="Earn $5 per invite (up to $25)"
+                  className="text-[16px] text-white tracking-normal"
+                />
+              </View>
             </View>
-          </View>
+          </TouchableOpacity>
         </View>
         <View className="w-full rounded-[20px] border-4 border-[#3B2086] p-4 flex flex-col gap-y-6">
-          <TouchableOpacity onPress={() => router.push("/kyc")}>
+          <TouchableOpacity onPress={() => router.push("/(app)/(home)/kyc")}>
             <View className="flex flex-row items-center gap-x-4">
               <Image
                 source={require("@/assets/images/identity.png")}
