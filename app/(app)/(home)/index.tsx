@@ -1,10 +1,12 @@
 import { DeflateText } from "@/components/deflate-text";
-import { usePrivy } from "@privy-io/expo";
+import { isNotCreated, useEmbeddedWallet, usePrivy } from "@privy-io/expo";
 import { Redirect, router } from "expo-router";
 import { Dimensions, Image, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LineChart } from "react-native-gifted-charts";
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
+import { DeflateBackdrop } from "@/components/deflate-backdrop";
 
 const lineData = [
   { value: 0 },
@@ -21,16 +23,25 @@ const chartOptions = ["4h", "24h", "3d", "7d", "30d", "All"];
 
 export default function HomeScreen() {
   const { user, isReady } = usePrivy();
+  const wallet = useEmbeddedWallet();
+
   const [chartData, setChartData] = useState<any[]>(lineData);
   const [chartRange, setChartRange] = useState<string>(chartOptions[1]);
+  const [mode, setMode] = useState<string>(
+    user?.custom_metadata?.mode?.toString() || "safe"
+  );
 
-  // useEffect(() => {
-  //   // shuffle chart data
-  //   const shuffledData = lineData.map((data) => ({
-  //     value: Math.floor(Math.random() * 10),
-  //   }));
-  //   setChartData(shuffledData);
-  // }, [chartRange]);
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
+
+  const handlePresentModalPress = useCallback(() => {
+    bottomSheetRef.current?.present();
+  }, []);
+
+  useEffect(() => {
+    if (user && isNotCreated(wallet)) {
+      wallet.create({ recoveryMethod: "privy" });
+    }
+  }, [user]);
 
   if (!user && isReady) {
     return <Redirect href={"/"} />;
@@ -38,7 +49,10 @@ export default function HomeScreen() {
 
   return (
     <>
-      <SafeAreaView className="bg-[#B6BCF9] h-screen flex flex-col justify-between">
+      <SafeAreaView
+        className="bg-[#B6BCF9] h-screen flex flex-col justify-between"
+        onTouchEnd={() => bottomSheetRef?.current?.dismiss()}
+      >
         <TouchableOpacity
           className="px-[24px]"
           onPress={() => router.push("/(app)/(home)/profile")}
@@ -154,23 +168,63 @@ export default function HomeScreen() {
             </View>
           </View>
         </View>
-        <View className="px-[24px]">
-          <View className="bg-white rounded-[20px] w-full h-[86px] flex flex-row items-center px-5">
-            <Text className="text-[48px] mr-3">😁</Text>
-            <View className="flex flex-col">
-              <DeflateText
-                text="Safe mode"
-                className="text-[20px]"
-                font="BG_Bold"
-              />
-              <DeflateText
-                text="Low-risk saving strategy"
-                className="text-[12px] text-[#8F8F91] tracking-normal"
-                font="BG_Medium"
-              />
+        {user?.custom_metadata?.mode !== "advanced" ? (
+          <TouchableOpacity
+            onPress={() => handlePresentModalPress()}
+            className="px-[24px]"
+          >
+            <View className="bg-white rounded-[20px] w-full h-[86px] flex flex-row items-center px-5">
+              <Text className="text-[48px] mr-3">⚡</Text>
+              <View className="flex flex-col">
+                <DeflateText
+                  text="Advanced mode"
+                  className="text-[20px]"
+                  font="BG_Bold"
+                />
+                <DeflateText
+                  text="Automated trading strategy"
+                  className="text-[12px] text-[#8F8F91] tracking-normal"
+                  font="BG_Medium"
+                />
+              </View>
             </View>
-          </View>
-        </View>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            className="px-[24px]"
+            onPress={() => handlePresentModalPress()}
+          >
+            <View className="bg-white rounded-[20px] w-full h-[86px] flex flex-row items-center px-5">
+              <Text className="text-[48px] mr-3">😁</Text>
+              <View className="flex flex-col">
+                <DeflateText
+                  text="Safe mode"
+                  className="text-[20px]"
+                  font="BG_Bold"
+                />
+                <DeflateText
+                  text="Low-risk saving strategy"
+                  className="text-[12px] text-[#8F8F91] tracking-normal"
+                  font="BG_Medium"
+                />
+              </View>
+            </View>
+          </TouchableOpacity>
+        )}
+
+        <BottomSheetModal
+          ref={bottomSheetRef}
+          stackBehavior="replace"
+          enableDismissOnClose
+          enableDynamicSizing
+          enableOverDrag={false}
+          enablePanDownToClose
+          backdropComponent={DeflateBackdrop}
+        >
+          <BottomSheetView className="h-[400px]">
+            <Text>Awesome 🎉</Text>
+          </BottomSheetView>
+        </BottomSheetModal>
       </SafeAreaView>
     </>
   );

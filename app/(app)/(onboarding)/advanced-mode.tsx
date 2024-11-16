@@ -1,8 +1,7 @@
 import { DeflateButton } from "@/components/deflate-button";
-import { DeflateInput } from "@/components/deflate-input";
 import { DeflateText } from "@/components/deflate-text";
 import { useUpdateUser } from "@/hooks/useUpdateUser";
-import { usePrivy } from "@privy-io/expo";
+import { isNotCreated, useEmbeddedWallet, usePrivy } from "@privy-io/expo";
 import { router } from "expo-router";
 import { useState } from "react";
 import { View } from "react-native";
@@ -10,6 +9,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function OnboardingScreen() {
   const { user } = usePrivy();
+  const wallet = useEmbeddedWallet();
   const [username, setUsername] = useState<string>("");
   const [answer1, setAnswer1] = useState<string | undefined>(
     user?.custom_metadata?.answer1 as string
@@ -25,6 +25,9 @@ export default function OnboardingScreen() {
 
   const handleConfirm = async () => {
     await updateUser({ answer1, answer2, answer3, mode: "advanced" });
+    if (isNotCreated(wallet)) {
+      await wallet.create({ recoveryMethod: "privy" });
+    }
     router.push("/(app)/(home)");
   };
 

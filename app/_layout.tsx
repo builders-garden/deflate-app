@@ -17,6 +17,9 @@ import {
 } from "@expo-google-fonts/inter";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import { base, polygon } from "viem/chains";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -49,21 +52,25 @@ export default function RootLayout() {
   }
 
   return (
-    <>
-      <PrivyProvider
-        appId={process.env.EXPO_PUBLIC_PRIVY_APP_ID!}
-        clientId={process.env.EXPO_PUBLIC_PRIVY_CLIENT_ID!}
-      >
-        <ThemeProvider
-          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+    <GestureHandlerRootView>
+      <BottomSheetModalProvider>
+        <PrivyProvider
+          appId={process.env.EXPO_PUBLIC_PRIVY_APP_ID!}
+          clientId={process.env.EXPO_PUBLIC_PRIVY_CLIENT_ID!}
+          supportedChains={[base, polygon]}
+          config={{}}
         >
-          <Stack>
-            <Stack.Screen name="(app)" options={{ headerShown: false }} />
-            <Stack.Screen name="+not-found" />
-          </Stack>
-        </ThemeProvider>
-        <PrivyElements />
-      </PrivyProvider>
-    </>
+          <ThemeProvider
+            value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+          >
+            <Stack>
+              <Stack.Screen name="(app)" options={{ headerShown: false }} />
+              <Stack.Screen name="+not-found" />
+            </Stack>
+          </ThemeProvider>
+          <PrivyElements />
+        </PrivyProvider>
+      </BottomSheetModalProvider>
+    </GestureHandlerRootView>
   );
 }
