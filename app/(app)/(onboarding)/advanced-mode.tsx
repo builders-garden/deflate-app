@@ -1,6 +1,7 @@
 import { DeflateButton } from "@/components/deflate-button";
 import { DeflateInput } from "@/components/deflate-input";
 import { DeflateText } from "@/components/deflate-text";
+import { useUpdateUser } from "@/hooks/useUpdateUser";
 import { usePrivy } from "@privy-io/expo";
 import { router } from "expo-router";
 import { useState } from "react";
@@ -10,6 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function OnboardingScreen() {
   const { user } = usePrivy();
   const [username, setUsername] = useState<string>("");
+  const { updateUser, isLoading } = useUpdateUser();
 
   return (
     <SafeAreaView className="bg-[#B6BCF9] h-screen flex flex-col justify-between px-[32px]">
@@ -30,7 +32,13 @@ export default function OnboardingScreen() {
         className="w-full text-center"
         textClassName="text-[24px]"
         disabled={username.length < 4}
-        onPress={() => router.push("/(app)/(home)")}
+        onPress={() => {
+          updateUser({ mode: "advanced" })
+            .then(() => {
+              router.push("/(app)/(home)");
+            })
+            .catch(() => {});
+        }}
       />
     </SafeAreaView>
   );

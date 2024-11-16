@@ -1,5 +1,6 @@
 import { DeflateButton } from "@/components/deflate-button";
 import { DeflateText } from "@/components/deflate-text";
+import { useUpdateUser } from "@/hooks/useUpdateUser";
 import { usePrivy } from "@privy-io/expo";
 import { router } from "expo-router";
 import { useState } from "react";
@@ -9,6 +10,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function SelectModeScreen() {
   const { user } = usePrivy();
   const [selectedMode, setSelectedMode] = useState<string>("safe");
+  const { updateUser, isLoading } = useUpdateUser();
 
   return (
     <SafeAreaView className="bg-[#B6BCF9] h-screen flex flex-col justify-between px-[32px]">
@@ -86,8 +88,11 @@ export default function SelectModeScreen() {
         textClassName="text-[24px]"
         onPress={() => {
           if (selectedMode === "safe") {
-            // go to home
-            router.push("/(app)/(home)");
+            updateUser({ mode: "safe" })
+              .then(() => {
+                router.push("/(app)/(home)");
+              })
+              .catch(() => {});
           } else {
             router.push("/(app)/(onboarding)/advanced-mode");
           }

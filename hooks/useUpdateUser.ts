@@ -10,6 +10,7 @@ export const useUpdateUser = () => {
   const updateUserMutation = async (data: {
     username?: string;
     mode?: string;
+    referrer?: string;
   }) => {
     setIsLoading(true);
     setError(null);

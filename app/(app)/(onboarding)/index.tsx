@@ -11,6 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function OnboardingScreen() {
   const { user } = usePrivy();
   const [username, setUsername] = useState<string>("");
+  const [referrer, setReferrer] = useState<string>("");
   const { updateUser, isLoading } = useUpdateUser();
 
   return (
@@ -33,23 +34,31 @@ export default function OnboardingScreen() {
           />
         )}
       </View>
-      <DeflateButton
-        text="Continue"
-        className="w-full text-center"
-        textClassName="text-[24px] text-white"
-        disabled={username.length < 4 || isLoading}
-        onPress={() => {
-          updateUser({
-            username,
-          })
-            .then(() => {
-              router.push("/(onboarding)/select-mode");
+      <View className="flex flex-col items-center gap-y-4">
+        <DeflateInput
+          value={referrer}
+          onValueChange={(value) => setReferrer(value.toLowerCase())}
+          placeholder="Referrer username"
+        />
+        <DeflateButton
+          text="Continue"
+          className="w-full text-center"
+          textClassName="text-[24px] text-white"
+          disabled={username.length < 4 || isLoading}
+          onPress={() => {
+            updateUser({
+              username,
+              referrer,
             })
-            .catch((error) => {
-              console.error(error);
-            });
-        }}
-      />
+              .then(() => {
+                router.push("/(onboarding)/select-mode");
+              })
+              .catch((error) => {
+                console.error(error);
+              });
+          }}
+        />
+      </View>
     </SafeAreaView>
   );
 }
