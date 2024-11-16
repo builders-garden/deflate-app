@@ -11,11 +11,12 @@ import { DeflateBackdrop } from "@/components/deflate-backdrop";
 import { base } from "viem/chains";
 import { createWalletClient, custom } from "viem";
 import * as WebBrowser from "expo-web-browser";
-import { useProfitAndLoss } from "@/hooks/useProfitAndLoss";
+import { usePortfolio } from "@/hooks/usePortfolio";
 import { ONE_INCH_TIMERANGE } from "@/lib/api/portfolio";
-import { useValueChart } from "@/hooks/useValueChart";
-import { useCurrentValue } from "@/hooks/useCurrentValue";
 import { useDeposit } from "@/hooks/useDeposit";
+import { initializeBiconomySmartAccount } from "@/lib/biconomy";
+import { useBiconomySmartAccount } from "@/hooks/useBiconomySmartAccount";
+import { useUpdateUser } from "@/hooks/useUpdateUser";
 
 const lineData = [
   { value: 0 },
@@ -32,27 +33,28 @@ const chartOptions = ["1d", "1w", "1m", "1y"];
 
 export default function HomeScreen() {
   const { user, isReady, getAccessToken } = usePrivy();
+  const { updateUser } = useUpdateUser();
   const wallet = useEmbeddedWallet();
+  const [isWalletInitialized, setIsWalletInitialized] = useState(false);
+  const { fetchSmartAccount, smartAccount } = useBiconomySmartAccount();
   const { deposit } = useDeposit();
 
   const [chartData, setChartData] = useState<any[]>(lineData);
   const [chartRange, setChartRange] = useState<string>("1w");
-  const { data: pnl = { data: { roi: 0 } }, refetch } = useProfitAndLoss(
-    ONE_INCH_TIMERANGE["1week"]
-  );
   const {
-    data: valueChart = [],
-    refetch: refetchValueChart,
-    error,
-  } = useValueChart(ONE_INCH_TIMERANGE["1week"]);
-  const { data: walletValue = { data: 0 }, refetch: refetchWalletValue } =
-    useCurrentValue();
+    data: portfolio,
+    refetch,
+    isLoading,
+  } = usePortfolio(ONE_INCH_TIMERANGE["1week"]);
 
   useEffect(() => {
-    getAccessToken().then((token) => {
-      console.log(token);
-    });
-  }, []);
+    if (user && wallet?.account?.address && !isWalletInitialized) {
+      setIsWalletInitialized(true);
+      fetchSmartAccount().then(async (account) => {
+        await updateUser({ smartAccountAddress: account?.account?.address });
+      });
+    }
+  }, [user, wallet, isWalletInitialized]);
 
   const bottomSheetRef = useRef<BottomSheetModal>(null);
 
@@ -107,13 +109,13 @@ export default function HomeScreen() {
   useEffect(() => {
     try {
       if (chartRange === "1d") {
-        refetchValueChart(ONE_INCH_TIMERANGE["1d"]);
+        refetch(ONE_INCH_TIMERANGE["1day"]);
       } else if (chartRange === "1w") {
-        refetchValueChart(ONE_INCH_TIMERANGE["1week"]);
+        refetch(ONE_INCH_TIMERANGE["1week"]);
       } else if (chartRange === "1m") {
-        refetchValueChart(ONE_INCH_TIMERANGE["1month"]);
+        refetch(ONE_INCH_TIMERANGE["1month"]);
       } else {
-        refetchValueChart(ONE_INCH_TIMERANGE["1year"]);
+        refetch(ONE_INCH_TIMERANGE["1year"]);
       }
     } catch (error) {
       console.error(error);
@@ -151,22 +153,23 @@ export default function HomeScreen() {
             className="text-[24px] text-[#3B2086]"
           />
           <DeflateText
-            text={`$${walletValue?.data || 0}`}
-            className="text-[64px] text-[#3B2086]"
+            text={`$${portfolio?.currentValue.toFixed(2) || "0.00"}`}
+            className="text-[64px] text-[#3B2086] text-center"
             font="BG_Bold"
           />
-          {pnl?.data?.roi && pnl?.data.roi > 0 ? (
+          {portfolio?.profitAndLoss?.roi && portfolio.profitAndLoss.roi > 0 ? (
             <View className="bg-white h-[32px] rounded-full flex items-center justify-center w-[100px]">
               <DeflateText
-                text={pnl?.data.roi.toString()}
+                text={`${(portfolio.profitAndLoss.roi * 100).toFixed(2)}%`}
                 className="text-emerald-500 text-[24px]"
                 font="BG_Bold"
               />
             </View>
-          ) : pnl?.data?.roi && pnl?.data.roi < 0 ? (
+          ) : portfolio?.profitAndLoss?.roi &&
+            portfolio?.profitAndLoss?.roi < 0 ? (
             <View className="bg-white h-[32px] rounded-full flex items-center justify-center w-[100px]">
               <DeflateText
-                text={pnl?.data.roi.toString()}
+                text={`${(portfolio?.profitAndLoss?.roi * 100).toFixed(2)}%`}
                 className="text-red-500 text-[24px]"
                 font="BG_Bold"
               />
@@ -210,12 +213,15 @@ export default function HomeScreen() {
               </View>
             </View>
           </View>
-          {lineData && (
+          {portfolio?.valueChart && (
             <View className="w-full py-4">
               <LineChart
                 curved
-                data={chartData}
-                height={150}
+                data={portfolio.valueChart.map((item) => ({
+                  value: item.value_usd,
+                }))}
+                areaChart
+                height={200}
                 initialSpacing={0}
                 yAxisSide={1}
                 yAxisIndicesWidth={0}
@@ -234,10 +240,12 @@ export default function HomeScreen() {
                 hideDataPoints
                 dataPointsColor1="#3B2086"
                 startFillColor1="#3B2086"
+                endFillColor1="#3B2086"
                 startOpacity={1}
+                endOpacity1={0.7}
                 hideAxesAndRules
               />
-              <View className="flex flex-row justify-evenly gap-x-4 w-full mt-4 px-4">
+              <View className="flex flex-row justify-evenly gap-x-4 w-full px-4">
                 {chartOptions.map((option) => (
                   <TouchableOpacity
                     onPress={() => {

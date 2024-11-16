@@ -12,6 +12,7 @@ export const updateUser = async ({
     answer1?: string;
     answer2?: string;
     answer3?: string;
+    smartAccountAddress?: string;
   };
 }) => {
   return ky
