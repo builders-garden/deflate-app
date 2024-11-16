@@ -35,7 +35,7 @@ export function KYCForm({ formData, onSubmit, onValueChange }: KYCFormProps) {
         <View className="flex flex-col gap-y-4">
           <DeflateInput
             placeholder="Fullname"
-            value={formData.fullName}
+            value={formData?.fullName}
             onValueChange={(value) =>
               onValueChange({ ...formData, fullName: value })
             }

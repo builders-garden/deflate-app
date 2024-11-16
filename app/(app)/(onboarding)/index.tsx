@@ -39,7 +39,9 @@ export default function OnboardingScreen() {
         textClassName="text-[24px] text-white"
         disabled={username.length < 4 || isLoading}
         onPress={() => {
-          updateUser(username)
+          updateUser({
+            username,
+          })
             .then(() => {
               router.push("/(onboarding)/select-mode");
             })

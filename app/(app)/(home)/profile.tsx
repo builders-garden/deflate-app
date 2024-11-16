@@ -9,7 +9,7 @@ export default function ProfileScreen() {
 
   return (
     <>
-      <SafeAreaView className="bg-[#B6BCF9] h-screen flex flex-col px-[24px] px-[24px]">
+      <SafeAreaView className="bg-[#B6BCF9] h-screen flex flex-col px-[24px]">
         <TouchableOpacity
           onPress={() => router.back()}
           className="h-[36px] w-[36px]"
@@ -53,7 +53,9 @@ export default function ProfileScreen() {
             </>
           )}
           <TouchableOpacity
-            onPress={() => router.push("/(app)/(home)/invite")}
+            onPress={() => {
+              router.push("/(app)/(home)/invite");
+            }}
             className="w-full"
           >
             <View className="h-[86px] w-full rounded-[20px] p-4 bg-[#3B2086] flex flex-row items-center gap-x-4 mb-4">

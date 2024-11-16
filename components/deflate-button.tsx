@@ -13,7 +13,7 @@ export const DeflateButton = ({
   onPress,
   text,
   className,
-  textClassName,
+  textClassName = "text-[#FFFFFF]",
   disabled = false,
 }: DeflateButtonProps) => {
   return (
@@ -24,7 +24,7 @@ export const DeflateButton = ({
     >
       <DeflateText
         text={text}
-        className={`text-white text-[16px] ${textClassName}`}
+        className={`text-[16px] ${textClassName}`}
         font="BG_Bold"
       />
     </TouchableOpacity>

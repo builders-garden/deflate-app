@@ -7,7 +7,8 @@ export const updateUser = async ({
 }: {
   token: string;
   data: {
-    username: string;
+    username?: string;
+    mode?: string;
   };
 }) => {
   return ky
