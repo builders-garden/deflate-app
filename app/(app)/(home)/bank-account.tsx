@@ -96,8 +96,8 @@ export default function BankAccountScreen() {
                 />
               </View>
 
-              <View className="border-2 border-[#3B2086] rounded-xl p-6 flex flex-col gap-6">
-                <View className="flex flex-col gap-1">
+              <View className="border-2 border-[#3B2086] rounded-xl p-4 flex flex-col gap-6">
+                <View className="flex flex-col">
                   <DeflateText
                     text="Fullname"
                     className="text-sm text-[#556FC5]/50"
@@ -110,7 +110,7 @@ export default function BankAccountScreen() {
                   />
                 </View>
 
-                <View className="flex flex-col gap-1">
+                <View className="flex flex-col">
                   <DeflateText
                     text="IBAN"
                     className="text-sm text-[#556FC5]/50"
@@ -123,7 +123,7 @@ export default function BankAccountScreen() {
                   />
                 </View>
 
-                <View className="flex flex-col gap-1">
+                <View className="flex flex-col">
                   <DeflateText
                     text="BIC / SWIFT code"
                     className="text-sm text-[#556FC5]/50"
