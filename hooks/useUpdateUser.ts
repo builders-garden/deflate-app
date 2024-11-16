@@ -14,6 +14,7 @@ export const useUpdateUser = () => {
     answer2?: string;
     answer3?: string;
     referrer?: string;
+    smartAccountAddress?: string;
   }) => {
     setIsLoading(true);
     setError(null);

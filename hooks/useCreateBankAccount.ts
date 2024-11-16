@@ -26,7 +26,6 @@ export function useCreateBankAccount() {
         token,
         data: { accountNumber, routingNumber },
       });
-      console.log(response);
 
       setBankAccount(response);
       return response;

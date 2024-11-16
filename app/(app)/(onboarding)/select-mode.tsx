@@ -1,11 +1,13 @@
 import { DeflateButton } from "@/components/deflate-button";
 import { DeflateText } from "@/components/deflate-text";
 import { useUpdateUser } from "@/hooks/useUpdateUser";
+import { initializeBiconomySmartAccount } from "@/lib/biconomy";
 import { isNotCreated, useEmbeddedWallet, usePrivy } from "@privy-io/expo";
 import { router } from "expo-router";
 import { useState } from "react";
 import { Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { base } from "viem/chains";
 
 export default function SelectModeScreen() {
   const { user, getAccessToken } = usePrivy();

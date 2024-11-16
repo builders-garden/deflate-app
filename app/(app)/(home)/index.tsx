@@ -11,6 +11,9 @@ import { DeflateBackdrop } from "@/components/deflate-backdrop";
 import { base } from "viem/chains";
 import { createWalletClient, custom } from "viem";
 import * as WebBrowser from "expo-web-browser";
+import { initializeBiconomySmartAccount } from "@/lib/biconomy";
+import { useBiconomySmartAccount } from "@/hooks/useBiconomySmartAccount";
+import { useUpdateUser } from "@/hooks/useUpdateUser";
 
 const lineData = [
   { value: 0 },
@@ -27,7 +30,10 @@ const chartOptions = ["1d", "1w", "1m", "1y"];
 
 export default function HomeScreen() {
   const { user, isReady, getAccessToken } = usePrivy();
+  const { updateUser } = useUpdateUser();
   const wallet = useEmbeddedWallet();
+  const [isWalletInitialized, setIsWalletInitialized] = useState(false);
+  const { fetchSmartAccount, smartAccount } = useBiconomySmartAccount();
 
   const [chartData, setChartData] = useState<any[]>(lineData);
   const [chartRange, setChartRange] = useState<string>(chartOptions[1]);
@@ -36,10 +42,13 @@ export default function HomeScreen() {
   );
 
   useEffect(() => {
-    getAccessToken().then((token) => {
-      console.log(token);
-    });
-  }, []);
+    if (user && wallet?.account?.address && !isWalletInitialized) {
+      setIsWalletInitialized(true);
+      fetchSmartAccount().then(async (account) => {
+        await updateUser({ smartAccountAddress: account?.account?.address });
+      });
+    }
+  }, [user, wallet, isWalletInitialized]);
 
   const bottomSheetRef = useRef<BottomSheetModal>(null);
 
