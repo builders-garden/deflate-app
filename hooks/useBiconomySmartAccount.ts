@@ -12,9 +12,11 @@ export function useBiconomySmartAccount() {
 
   async function initializeSmartAccount() {
     console.log("INITIALIZING SMART ACCOUNT");
-    const smartAccount = await initializeBiconomySmartAccount(wallet, base);
+    const result = await initializeBiconomySmartAccount(wallet, base);
+    if (!result) return;
+    const { smartAccount, compressedSessionData } = result;
     setSmartAccount(smartAccount);
-    return smartAccount;
+    return { smartAccount, compressedSessionData };
   }
 
   return {

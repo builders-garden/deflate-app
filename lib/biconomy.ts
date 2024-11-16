@@ -6,6 +6,7 @@ import {
   CreateSessionDataParams,
   NexusClient,
   ParamCondition,
+  SessionData,
 } from "@biconomy/sdk";
 import { getAction } from "viem/utils";
 import { EmbeddedWalletState } from "@privy-io/expo";
@@ -71,12 +72,12 @@ export const initializeBiconomySmartAccount = async (
     const nexusSessionClient = nexusClient.extend(
       smartSessionCreateActions(sessionsModule)
     );
-    await createSmartSession(
+    const compressedSessionData = await createSmartSession(
       nexusClient,
       nexusSessionClient,
       wallet.account?.address as `0x${string}`
     );
-    return nexusSessionClient;
+    return { smartAccount: nexusClient, compressedSessionData };
   } catch (err) {
     throw err instanceof Error
       ? err
@@ -123,4 +124,17 @@ export const createSmartSession = async (
   const { success } = await nexusClient.waitForUserOperationReceipt({
     hash: createSessionsResponse.userOpHash,
   });
+
+  const sessionData: SessionData = {
+    granter: nexusClient.account.address,
+    sessionPublicKey,
+    moduleData: {
+      permissionIds: [cachedPermissionId],
+      mode: "0x00",
+    },
+  };
+
+  const compressedSessionData = JSON.stringify(sessionData);
+
+  return compressedSessionData;
 };

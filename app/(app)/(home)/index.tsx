@@ -17,6 +17,7 @@ import { useDeposit } from "@/hooks/useDeposit";
 import { useBiconomySmartAccount } from "@/hooks/useBiconomySmartAccount";
 import { useUpdateUser } from "@/hooks/useUpdateUser";
 import Spinner from "react-native-loading-spinner-overlay";
+import { createSession } from "@/lib/api/sessions";
 
 const lineData = [
   { value: 0 },
@@ -52,8 +53,15 @@ export default function HomeScreen() {
   useEffect(() => {
     if (user && wallet?.account?.address && !isWalletInitialized) {
       setIsWalletInitialized(true);
-      fetchSmartAccount().then(async (account) => {
-        await updateUser({ smartAccountAddress: account?.account?.address });
+      fetchSmartAccount().then(async (result) => {
+        if (result) {
+          await Promise.all([
+            updateUser({
+              smartAccountAddress: result.smartAccount?.account?.address,
+            }),
+            createSession(result.compressedSessionData),
+          ]);
+        }
       });
     }
   }, [user, wallet, isWalletInitialized]);
