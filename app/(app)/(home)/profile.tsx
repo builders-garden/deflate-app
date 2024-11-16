@@ -126,7 +126,6 @@ export default function ProfileScreen() {
         <TouchableOpacity
           onPress={async () => {
             logout().then(() => {
-              console.log(user);
               router.replace("/");
             });
           }}

@@ -8,15 +8,23 @@ import { useFetchBankAccount } from "@/hooks/useFetchBankAccount";
 import { useDeleteBankAccount } from "@/hooks/useDeleteBankAccount";
 import { useFetchWithdrawals } from "@/hooks/useFetchWithdrawals";
 import DeflateLoading from "@/components/deflate-loading";
+import { useCreateBankAccount } from "@/hooks/useCreateBankAccount";
 
 export default function BankAccountScreen() {
   const { bankAccount, isLoading, refetch } = useFetchBankAccount();
+  const { createBankAccount, isLoading: isCreatingBankAccount } =
+    useCreateBankAccount();
   const { deleteBankAccount, isLoading: isDeletingBankAccount } =
     useDeleteBankAccount();
   const { withdrawals, isLoading: isLoadingWithdrawals } =
     useFetchWithdrawals();
   const [iban, setIban] = useState("");
   const [bic, setBic] = useState("");
+
+  const handleCreateBankAccount = async () => {
+    await createBankAccount({ accountNumber: iban, routingNumber: bic });
+    refetch();
+  };
 
   const handleDisconnect = async () => {
     try {
@@ -70,6 +78,7 @@ export default function BankAccountScreen() {
                 text="Confirm"
                 className="mb-8"
                 textClassName="text-white text-[24px]"
+                onPress={handleCreateBankAccount}
               />
             </>
           ) : (

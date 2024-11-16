@@ -26,11 +26,15 @@ export function useCreateBankAccount() {
         token,
         data: { accountNumber, routingNumber },
       });
+      console.log(response);
 
       setBankAccount(response);
       return response;
     } catch (err) {
-      setError(err instanceof Error ? err : new Error("Failed to create bank account"));
+      console.error(err);
+      setError(
+        err instanceof Error ? err : new Error("Failed to create bank account")
+      );
       throw err;
     } finally {
       setIsLoading(false);
