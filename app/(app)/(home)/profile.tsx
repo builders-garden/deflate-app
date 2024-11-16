@@ -1,11 +1,29 @@
 import { DeflateText } from "@/components/deflate-text";
+import { useFetchKYC } from "@/hooks/useFetchKYC";
+import { KycStatus } from "@/lib/api/kyc";
 import { usePrivy } from "@privy-io/expo";
 import { router } from "expo-router";
+import { useEffect } from "react";
 import { Image, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ProfileScreen() {
-  const { user, isReady, logout } = usePrivy();
+  const { user, logout } = usePrivy();
+  const { kycLink } = useFetchKYC();
+
+  useEffect(() => {
+    if (!user) {
+      router.replace("/");
+    }
+  }, [user]);
+
+  if (!user) {
+    return (
+      <>
+        <SafeAreaView className="bg-[#B6BCF9] h-screen flex flex-col px-[24px]"></SafeAreaView>
+      </>
+    );
+  }
 
   return (
     <>
@@ -101,7 +119,13 @@ export default function ProfileScreen() {
               </View>
             </View>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => router.push("/bank-account")}>
+          <TouchableOpacity
+            disabled={kycLink?.kycStatus !== KycStatus.APPROVED}
+            onPress={() => router.push("/bank-account")}
+            className={
+              kycLink?.kycStatus !== KycStatus.APPROVED ? "opacity-50" : ""
+            }
+          >
             <View className="flex flex-row items-center gap-x-4">
               <Image
                 source={require("@/assets/images/banknote.png")}
@@ -148,9 +172,7 @@ export default function ProfileScreen() {
         </View>
         <TouchableOpacity
           onPress={async () => {
-            logout().then(() => {
-              router.replace("/");
-            });
+            logout();
           }}
           className="mt-auto mb-8"
         >

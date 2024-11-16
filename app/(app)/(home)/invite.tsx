@@ -31,7 +31,8 @@ export default function InviteFriendsScreen() {
       mode: "onchain",
       indexingValue: `deflate-${wallet.account?.address}`,
     });
-    setInvites(attestations?.size || 0);
+
+    setInvites(attestations?.total || 0);
   };
 
   return (

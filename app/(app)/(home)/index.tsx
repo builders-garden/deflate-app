@@ -14,9 +14,9 @@ import * as WebBrowser from "expo-web-browser";
 import { usePortfolio } from "@/hooks/usePortfolio";
 import { ONE_INCH_TIMERANGE } from "@/lib/api/portfolio";
 import { useDeposit } from "@/hooks/useDeposit";
-import { initializeBiconomySmartAccount } from "@/lib/biconomy";
 import { useBiconomySmartAccount } from "@/hooks/useBiconomySmartAccount";
 import { useUpdateUser } from "@/hooks/useUpdateUser";
+import Spinner from "react-native-loading-spinner-overlay";
 
 const lineData = [
   { value: 0 },
@@ -38,6 +38,8 @@ export default function HomeScreen() {
   const [isWalletInitialized, setIsWalletInitialized] = useState(false);
   const { fetchSmartAccount, smartAccount } = useBiconomySmartAccount();
   const { deposit } = useDeposit();
+  const [isDepositLoading, setIsDepositLoading] = useState<boolean>(false);
+  const [isWithdrawLoading, setIsWithdrawLoading] = useState<boolean>(false);
 
   const [chartData, setChartData] = useState<any[]>(lineData);
   const [chartRange, setChartRange] = useState<string>("1w");
@@ -63,6 +65,7 @@ export default function HomeScreen() {
   }, []);
 
   const openDeposit = async () => {
+    setIsDepositLoading(true);
     try {
       const userWalletAddress = wallet?.account?.address;
       const privy = new Privy({
@@ -98,11 +101,26 @@ export default function HomeScreen() {
       console.log(`opening ${redirectUrl}`);
       const result = await WebBrowser.openBrowserAsync(redirectUrl.toString());
 
-      if (result.type === WebBrowser.WebBrowserResultType.CANCEL) {
-        await deposit({ amount: 5 });
-      }
+      // if (result.type === WebBrowser.WebBrowserResultType.CANCEL) {
+      //   await deposit({ amount: 5 });
+      // }
     } catch (error) {
       console.error(error);
+    } finally {
+      setIsDepositLoading(false);
+    }
+  };
+
+  const withdraw = async () => {
+    try {
+      setIsWithdrawLoading(true);
+
+      // wait 2 seconds
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsWithdrawLoading(false);
     }
   };
 
@@ -128,6 +146,37 @@ export default function HomeScreen() {
 
   return (
     <>
+      <Spinner
+        visible={isLoading}
+        textContent={"Fetching your portfolio..."}
+        overlayColor="rgba(1,1,1,0.8)"
+        customIndicator={
+          <Text className="text-[96px] animate-bounce transition-none">🎈</Text>
+        }
+        textStyle={{ color: "#FFF" }}
+      />
+      <Spinner
+        visible={isDepositLoading}
+        textContent={"Defeating inflation.."}
+        overlayColor="rgba(1,1,1,0.8)"
+        customIndicator={
+          <Text className="text-[96px] animate-pulse transition-none mb-2">
+            🏦
+          </Text>
+        }
+        textStyle={{ color: "#FFF" }}
+      />
+      <Spinner
+        visible={isWithdrawLoading}
+        textContent={"Withdrawing.."}
+        overlayColor="rgba(1,1,1,0.8)"
+        customIndicator={
+          <Text className="text-[96px] animate-pulse transition-none mb-2">
+            🤑
+          </Text>
+        }
+        textStyle={{ color: "#FFF" }}
+      />
       <SafeAreaView
         className="bg-[#B6BCF9] h-screen flex flex-col justify-between"
         onTouchEnd={() => bottomSheetRef?.current?.dismiss()}
@@ -158,18 +207,18 @@ export default function HomeScreen() {
             font="BG_Bold"
           />
           {portfolio?.profitAndLoss?.roi && portfolio.profitAndLoss.roi > 0 ? (
-            <View className="bg-white h-[32px] rounded-full flex items-center justify-center w-[100px]">
+            <View className="bg-white h-[32px] rounded-full flex items-center justify-center px-2">
               <DeflateText
-                text={`${(portfolio.profitAndLoss.roi * 100).toFixed(2)}%`}
+                text={`+${(portfolio.profitAndLoss.roi * 100).toFixed(2)}%`}
                 className="text-emerald-500 text-[24px]"
                 font="BG_Bold"
               />
             </View>
           ) : portfolio?.profitAndLoss?.roi &&
             portfolio?.profitAndLoss?.roi < 0 ? (
-            <View className="bg-white h-[32px] rounded-full flex items-center justify-center w-[100px]">
+            <View className="bg-white h-[32px] rounded-full flex items-center justify-center px-2">
               <DeflateText
-                text={`${(portfolio?.profitAndLoss?.roi * 100).toFixed(2)}%`}
+                text={`-${(portfolio?.profitAndLoss?.roi * 100).toFixed(2)}%`}
                 className="text-red-500 text-[24px]"
                 font="BG_Bold"
               />
@@ -197,7 +246,7 @@ export default function HomeScreen() {
             </View>
             <View className="flex flex-col items-center justify-center">
               <View className="rounded-full flex items-center justify-center">
-                <TouchableOpacity>
+                <TouchableOpacity onPress={() => withdraw()}>
                   <Image
                     source={require("@/assets/images/withdraw.png")}
                     height={54}
@@ -248,7 +297,18 @@ export default function HomeScreen() {
               <View className="flex flex-row justify-evenly gap-x-4 w-full px-4">
                 {chartOptions.map((option) => (
                   <TouchableOpacity
-                    onPress={() => setChartRange(option)}
+                    onPress={() => {
+                      setChartRange(option);
+                      refetch(
+                        option === "1d"
+                          ? ONE_INCH_TIMERANGE["1day"]
+                          : option === "1w"
+                          ? ONE_INCH_TIMERANGE["1week"]
+                          : option === "1m"
+                          ? ONE_INCH_TIMERANGE["1month"]
+                          : ONE_INCH_TIMERANGE["1year"]
+                      );
+                    }}
                     className={
                       chartRange === option
                         ? "flex flex-col items-center justify-center p-[10px] bg-[#556FC5]/50 rounded-xl w-[50px]"
@@ -258,7 +318,7 @@ export default function HomeScreen() {
                   >
                     <DeflateText
                       text={option}
-                      font="BG_Medium"
+                      font={chartRange === option ? "BG_Bold" : "BG_Medium"}
                       className="text-[#3B2086] text-[16px]"
                     />
                   </TouchableOpacity>
@@ -325,40 +385,30 @@ export default function HomeScreen() {
               <View className="flex flex-col gap-y-4">
                 <DeflateText
                   text="😁 Safe mode"
-                  className="text-[24px]"
+                  className="text-[36px] text-center"
                   font="BG_Bold"
                 />
-                <Text className="text-[16px]">
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  Eaque, qui obcaecati. Reiciendis accusamus dicta ea eius
-                  facilis corrupti repellat ipsam voluptatibus ullam minima
-                  aspernatur facere consequuntur dolores earum, amet cupiditate.
-                </Text>
-                <Text className="text-[16px]">
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  Eaque, qui obcaecati. Reiciendis accusamus dicta ea eius
-                  facilis corrupti repellat ipsam voluptatibus ullam minima
-                  aspernatur facere consequuntur dolores earum, amet cupiditate.
+                <Text className="text-[20px]">
+                  Prioritize stability with SafeMode. Enjoy peace of mind
+                  knowing your funds are safeguarded with the lowest risk
+                  tolerance, delivering consistent yields designed to beat
+                  inflation. Perfect for users who value simplicity and
+                  security.
                 </Text>
               </View>
             ) : (
               <View className="flex flex-col gap-y-4">
                 <DeflateText
                   text="⚡ Advanced mode"
-                  className="text-[24px]"
+                  className="text-[36px] text-center"
                   font="BG_Bold"
                 />
-                <Text className="text-[16px]">
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  Eaque, qui obcaecati. Reiciendis accusamus dicta ea eius
-                  facilis corrupti repellat ipsam voluptatibus ullam minima
-                  aspernatur facere consequuntur dolores earum, amet cupiditate.
-                </Text>
-                <Text className="text-[16px]">
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  Eaque, qui obcaecati. Reiciendis accusamus dicta ea eius
-                  facilis corrupti repellat ipsam voluptatibus ullam minima
-                  aspernatur facere consequuntur dolores earum, amet cupiditate.
+                <Text className="text-[20px]">
+                  Maximize your potential returns with AdvancedMode. This option
+                  takes on higher risk tolerance to unlock opportunities for
+                  greater yields, all while remaining fully automated. Ideal for
+                  users comfortable with a bit more volatility in pursuit of
+                  higher rewards.
                 </Text>
               </View>
             )}

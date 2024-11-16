@@ -21,6 +21,7 @@ export function usePortfolio(timerange: ONE_INCH_TIMERANGE) {
       setPortfolio(response);
       return response;
     } catch (err) {
+      console.error(err);
       setError(
         err instanceof Error
           ? err
